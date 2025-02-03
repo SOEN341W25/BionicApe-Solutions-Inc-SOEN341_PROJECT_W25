@@ -72,7 +72,11 @@ app.get("/api/user/:username", async function (req, res){
   res.status(200).json(user);
 });
 
+app.get("/api/user", async function (req,res){
+  users=await User.find({});
+  res.status(200).json(users);
 
+});
 
 //HTTP FOR CHANNEL
 //This one retrieves single channel by channel name
@@ -134,7 +138,7 @@ app.delete("/api/channel/:channelName", async function (req, res){
 //=====================
 
 // Showing home page
-app.get("/", function (req, res) {
+app.get("", function (req, res) {
   res.render("home");
 });
 

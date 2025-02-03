@@ -7,7 +7,7 @@ ChatHaven is a versatile communication platform designed for seamless interactio
 * Talal Hammami : FrontEnd Developer
 * Mari Kajita : Backend Developer 
 * Suriya Paramathypathy : FrontEnd Developer
-* Levon Tavitian : Backend Developer, Sprint #1 Scrumaster
+* Levon Tavitian : Backend Developer, Sprint #1 Scrum Master
 * Mathis Vuong : Backend Developer
 
 ## Requirements
@@ -50,3 +50,6 @@ https://www.geeksforgeeks.org/login-form-using-node-js-and-mongodb/
 https://www.geeksforgeeks.org/how-to-install-mongodb-on-windows/
 
 
+## To test out the rest API, please install Postman and load the JSON inside the postman folder
+
+https://www.postman.com/downloads/
