@@ -10,12 +10,12 @@
 
 <h1>login</h1>
 
-<form action="/login" method="POST">
+<form class ="form">
     <input type="text" name="username"
         placeholder="username"/>
     <input type="password" name="password" 
         placeholder="password"/>
-    <button>login</button>
+    <button type="submit">login</button>
 </form>
 
 <h1>This is home page</h1>
@@ -23,6 +23,40 @@
 <body>
     <h1> Welcome to ChatHaven</h1>
     <p>It all starts here.</p>
+    <p id="someId"> This text will be replaced.</p>
+<script>
+  
+  fetch("/api/user/admin")
+        .then((res)=> res.json())
+        .then((data)=>{
+            document.getElementById("someId").innerHTML = JSON.stringify(data.username);
+            console.log( data );
+
+        })
+        .catch(console.error);
+        
+ const formEl = document.querySelector('.form');
+        
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();//prevent from refreshing page on submit
+            const formData = new FormData(formEl);//goal: to send to the server a JSON object with user name and pw
+            const data = Object.fromEntries(formData);//the func Obj.fromEntries requires a formData type and is stored to data
+            
+            fetch('/login',{
+                method: 'POST',//used to create a new resource on the server
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then((res)=>res.json())
+                .then((data)=>{
+                    window.location.replace("/adminPage");//redirect to admin page
+                })
+                .catch(console.error);
+        });
+
+</script>
 </body>
 
 <li><a href="/register">Sign up!!</a></li>

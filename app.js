@@ -1,4 +1,4 @@
-// Filename - App.js
+// Filename - App.js (server)
 
 //=====================
 // REQUIRES (INCLUDES)
@@ -9,6 +9,7 @@ const path=require('path');//include path library for combining path together
     
 require('./database/db');   
 const User = require("./model/User");
+const Channel = require("./model/Channel");
 //============================
 //SETUP EXPRESS
 //============================
@@ -21,7 +22,7 @@ app.use(express.static(path.join(__dirname,'public')));
 app.set("view engine", "ejs");//setup view engine ejs
 app.set('views', path.join(__dirname, 'views'));
 var bodyParser=require('body-parser')//support data payload for post requests
-//app.use( bodyParser.json() );       // to support JSON-encoded bodies
+app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 
 
@@ -65,10 +66,57 @@ app.get("/editUser", isLoggedIn, async function (req, res) {
 // REST API FOR DATA
 //=====================
 
-//HTTP GET REQUEST TO RETIEVE USER
+//HTTP FOR USER
 app.get("/api/user/:username", async function (req, res){
   user=await User.findOne({username: req.params.username});
   res.status(200).json(user);
+});
+
+
+
+//HTTP FOR CHANNEL
+//This one retrieves single channel by channel name
+app.get("/api/channel/:channelName",async function (req, res){
+  channel=await Channel.findOne({channelName: req.params.channelName});
+  res.status(200).json(channel);
+});
+//This one gets all channels (good for admin)
+app.get("/api/channel", async function (req,res){
+  channels=await Channel.find({});
+  res.status(200).json(channels);
+});
+//This gets all channels by username (good for users)
+app.get("/api/channel/user/:username", async function(req, res){
+  channels=await Channel.find({users:req.params.username});
+  res.status(200).json(channels);
+});
+
+//This one creates a channel by username (good for admin page)
+app.post("/api/channel", async function (req, res){
+  console.log("Inside post channel"+req.body.channelName);
+  const channel = await Channel.findOne({channelName: req.body.channelName});
+if(!channel)
+{
+  const newChannel = await Channel.create({
+    channelName: req.body.channelName
+  });
+  return res.status(200).json(newChannel);
+}
+else
+{
+  return res.status(403).json({error: "channel already exists"});
+}
+
+});
+//This one modifies the channel by providing the username
+app.put("/api/channel/:channelName", async function (req,res){
+  channel=await Channel.findOneAndUpdate({channelName: req.params.channelName},{users:req.body.users});
+  res.status(200).json(channel);
+});
+//This one deletes the channel by channel name
+app.delete("/api/channel/:channelName", async function (req, res){
+  channel=await Channel.deleteOne({channelName: req.params.channelName});
+  res.status(200).json(channel);
 });
 
 
@@ -128,9 +176,9 @@ app.post("/login", async function(req, res){
         //check if password matches
         const result = req.body.password === user.password;
         if (result) {
-          req.session.user=req.body.username;
+          req.session.user=req.body.username;//to log in
           console.log("Set Current Session variable:" +req.session.user)
-          res.redirect("/adminPage");
+          res.status(200).json({status:"Logged in"})// ask user to change html page
         } else {
           res.status(400).json({ error: "password doesn't match" });
         }
@@ -144,25 +192,25 @@ app.post("/login", async function(req, res){
 //Handling user logout 
 app.get("/logout", function (req, res) {
   console.log("Current session destroyed: "+ req.session.user)
-  req.session,destroy()
+  req.session.destroy()//to destroy the whole session
   res.redirect('/');
     
 });
 
 //Function used to check if session is still valid
 function isLoggedIn(req, res, next) {
-  const sessionUser=req.sessionuser || 'No session set';
+  const sessionUser=req.session.user || 'No session set';
   if(req.session.user){
     console.log("Current session variable: "+sessionUser)
     return next();
   }
   console.log("Current session variable: "+sessionUser)
-  if(req.url,include("api"))
+  if(req.url.includes("api"))//if url contains an api, then we send back a JSON and say you are not authorized
   {
     res.status(401).json({error:"Unauthorized"});
   }
   else{
-    res.redirect("/login");
+    res.redirect("/login");//not an api call and not authorized, request for a html page so we send them back to the log in page because there not logged in
   }
 }
 
