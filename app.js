@@ -6,10 +6,11 @@
 const express = require("express");
 const session =require('express-session');//routing api library
 const path=require('path');//include path library for combining path together
-    
+
 require('./database/db');   
 const User = require("./model/User");
 const Channel = require("./model/Channel");
+const bcrypt = require("bcrypt");
 //============================
 //SETUP EXPRESS
 //============================
@@ -147,32 +148,58 @@ app.get("/register", function (req, res) {
 res.render("register");
 });
 
-// Handling user signup
-app.post("/register", async (req, res) => {
-
-const user = await User.findOne({username: req.body.username});
-if(!user)
-{
-  const newUser = await User.create({
-    username: req.body.username,
-    password: req.body.password,
-    role: "NormalUser",
-    channels:["HomeChannel", "ApeChannel"]
-});
-  return res.status(200).json(newUser);
-}
-else
-{
-  return res.status(403).json({error: "user already exists"});
-}
-});
-
 //Showing login form
 app.get("/login", function (req, res) {
   res.render("login");
 });
+
+//Handling user logout 
+app.get("/logout", function (req, res) {
+  console.log("Current session destroyed: "+ req.session.user)
+  req.session.destroy()//to destroy the whole session
+  res.redirect('/');
+
+});
+
+// Handling user signup
+app.post('/register', async (req, res) => {
+  const existingUsername = await User.findOne({username: req.body.username});
+  if (existingUsername) {
+    return res.status(400).render("signup", { error: "Username already exists. Please try a different username." });
+  }
+
+  // Check if the user is trying to register as an admin
+  const isAdmin = isAdminCheckbox === 'on'; // Checkbox value is 'on' when checked
+
+  // Validate admin password if the user claims to be an admin
+  if (isAdmin) {
+      const correctAdminPassword = "PETERGRIFFIN2025";
+      if (admin_pass !== correctAdminPassword) {
+          // If the admin password is incorrect, render the register page with an error message
+          return res.status(400).render('register', { error: "Incorrect admin password. Please try again." });
+      }
+  }
+
+  // If the admin password is correct (or the user is not an admin), proceed with registration
+  try {
+      const newUser = await User.create({
+          username,
+          password,
+          role: isAdmin ? "Admin" : "NormalUser", // Set role based on admin status
+          channels: ["HomeChannel", "ApeChannel"]
+      });
+
+      // Redirect to login or another page after successful registration
+      res.redirect('/login');
+  } catch (error) {
+      console.error(error);
+      res.status(500).render('register', { error: "An error occurred during registration. Please try again." });
+  }
+});
+
+
 //Handling user login
-app.post("/login", async function(req, res){
+app.post("/login", async (req, res) =>{
   try {
       // check if the user exists
       const user = await User.findOne({ username: req.body.username });
@@ -193,13 +220,7 @@ app.post("/login", async function(req, res){
       res.status(400).json({ error });
     }
 });
-//Handling user logout 
-app.get("/logout", function (req, res) {
-  console.log("Current session destroyed: "+ req.session.user)
-  req.session.destroy()//to destroy the whole session
-  res.redirect('/');
-    
-});
+
 
 //Function used to check if session is still valid
 function isLoggedIn(req, res, next) {

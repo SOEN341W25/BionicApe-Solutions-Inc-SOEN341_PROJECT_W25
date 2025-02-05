@@ -22,4 +22,4 @@ Channel.method.toJSON= function(){
 }
 
 //this is a mongodb collection
-module.exports = mongoose.model('Channel', Channel)
+module.exports = mongoose.model('channels', Channel)

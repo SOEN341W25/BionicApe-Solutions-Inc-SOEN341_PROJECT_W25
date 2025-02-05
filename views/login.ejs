@@ -1,65 +1,31 @@
-// Filename - views/login.ejs
 <!DOCTYPE html>
 <html lang-="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, intial-scaled=1.0">
-    <link rel="stylesheet" href="/styles/main.css">
+    <title>Login</title>
+    <link rel="stylesheet" href="style.css">
 
 </head>
-
-<h1>login</h1>
-
-<form class ="form">
-    <input type="text" name="username"
-        placeholder="username"/>
-    <input type="password" name="password" 
-        placeholder="password"/>
-    <button type="submit">login</button>
-</form>
-
-<h1>This is home page</h1>
-
 <body>
-    <h1> Welcome to ChatHaven</h1>
-    <p>It all starts here.</p>
-    <p id="someId"> This text will be replaced.</p>
-<script>
-  
-  fetch("/api/user/admin")
-        .then((res)=> res.json())
-        .then((data)=>{
-            document.getElementById("someId").innerHTML = JSON.stringify(data.username);
-            console.log( data );
 
-        })
-        .catch(console.error);
-        
- const formEl = document.querySelector('.form');
-        
-        formEl.addEventListener('submit', event => {
-            event.preventDefault();//prevent from refreshing page on submit
-            const formData = new FormData(formEl);//goal: to send to the server a JSON object with user name and pw
-            const data = Object.fromEntries(formData);//the func Obj.fromEntries requires a formData type and is stored to data
-            
-            fetch('/login',{
-                method: 'POST',//used to create a new resource on the server
-                headers:{
-                    'Content-Type':'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-            .then((res)=>res.json())
-                .then((data)=>{
-                    window.location.replace("/adminPage");//redirect to admin page
-                })
-                .catch(console.error);
-        });
+<div class="form-container">
+    <h2>Login</h2>
+    <form action="/login" method="post">
+        <div class="form-group">
+            <label for="Username">Name: </label>
+            <input type="text" name="username" id="username" placeholder="Enter your username" required autocomplete="off">
+        </div>
+        <div class="form-group">
+            <label for="password">Password: </label>
+            <input type="password" name="password" id="password" placeholder="Enter Password" required>
+        </div>
+        <button type="submit" class="submit-btn">Login</button>
+    </form>
+    
+    <p>Don't have an account? <a href="/register">Sign Up</a></p>
+</div>
 
-</script>
 </body>
 
-<li><a href="/register">Sign up!!</a></li>
-<li><a href="/login">Login</a></li>
-<li><a href="/logout">Logout</a></li>
 </html>

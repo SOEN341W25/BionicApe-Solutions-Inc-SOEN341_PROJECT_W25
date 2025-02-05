@@ -24,8 +24,7 @@ User.method.toJSON= function(){
     delete obj.password;
     delete obj._id;
     return obj;
-
 }
 
 //this is mongodb collection
-module.exports = mongoose.model('User', User)
+module.exports = mongoose.model('users', User)
