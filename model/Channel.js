@@ -7,7 +7,7 @@ var Channel = new Schema({
     channelName: {
         type: String
     },
-
+    
     users: {
         type:[String]
     }
@@ -20,4 +20,6 @@ Channel.method.toJSON= function(){
     return obj;
 
 }
+
+//this is a mongodb collection
 module.exports = mongoose.model('Channel', Channel)

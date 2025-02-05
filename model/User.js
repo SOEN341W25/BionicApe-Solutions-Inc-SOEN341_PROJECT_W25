@@ -26,4 +26,6 @@ User.method.toJSON= function(){
     return obj;
 
 }
+
+//this is mongodb collection
 module.exports = mongoose.model('User', User)

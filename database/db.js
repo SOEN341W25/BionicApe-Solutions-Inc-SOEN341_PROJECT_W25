@@ -1,7 +1,7 @@
 const mongoose=require("mongoose");//to use mongoose library to have the function to retrieve the data from the database
 const User=require("../model/User"); //similar to include file but simultaneously the class (.h file like cpp)
 
-const MONGO_URI= 'mongodb://localhost/db';//url in the database '/db' the database is called db  
+const MONGO_URI= 'mongodb://localhost:27017/';//url in the database '/db' the database is called db  
 
 //Function to create the default admin user if not exists
 async function createDefaultAdmin(){
@@ -26,6 +26,8 @@ async function createDefaultAdmin(){
             console.error('Error checking or creating admin user:', error);//error in case something goes wrong
     }
 }
+
+
 mongoose.connect(MONGO_URI,{//URI is an address
     useNewUrlParser: true,
     useUnifiedTopology: true,
