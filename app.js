@@ -234,7 +234,15 @@ app.post("/login", async (req, res) =>{
         if (result) {
           req.session.user=req.body.username;//to log in
           console.log("Set Current Session variable:" +req.session.user)
-          res.status(200).json({status:"Logged in"})// ask user to change html page
+          
+          // res.status(200).json({status:"Logged in"})// ask user to change html page
+          if(user.role === "admin"){
+            res.redirect('/adminPage'); 
+          }
+          else {
+            res.status(200).json({status:"Logged in"})
+          }
+
         } else {
           res.status(400).json({ error: "password doesn't match" });
         }
