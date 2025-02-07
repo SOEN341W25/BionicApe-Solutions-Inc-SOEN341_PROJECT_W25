@@ -13,7 +13,7 @@ async function createDefaultAdmin(){
             const newAdmin=new User({
                 username:'admin',
                 password:'admin',
-                role: 'admin'
+                role: 'Admin'
             });
             await newAdmin.save();//save the admin data
             console.log('Default admin user created.');

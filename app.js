@@ -236,7 +236,7 @@ app.post("/login", async (req, res) =>{
           console.log("Set Current Session variable:" +req.session.user)
           
           // res.status(200).json({status:"Logged in"})// ask user to change html page
-          if(user.role === "admin"){
+          if(user.role === "Admin"){
             res.redirect('/adminPage'); 
           }
           else {
@@ -278,7 +278,7 @@ async function isAdmin(req,res,next){
     const user = await User.findOne({ username: req.session.user });
     if (user) {
       //check if password matches
-      const result =  user.role === "admin";
+      const result =  user.role === "Admin";
       if(result)
       {
         console.log("User has admin role ");
