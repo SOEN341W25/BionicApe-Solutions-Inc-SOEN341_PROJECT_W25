@@ -1,32 +1,45 @@
-<h1>This is admin page</h1>
+<!DOCTYPE html>
+<html lang-="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, intial-scaled=1.0">
+    <title>Login</title>
+
+
+</head>
+
+
 
 <body>
-	<form class ="form">
-			<input type="text" name="channelName" 
-			placeholder="channelName"/>
-		<button type="submit">create</button>
+	<div class="admin-container">
+	<div class="admin-left-column">
+	<h1 class="admin-title">Admin Hub</h1>
+	<form class ="admin-form">
+			<input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
+		<button class="admin-btn" type="submit">create</button>
 	</form>
     
-	<p id="resultOfCreation">
+	<p class="admin-result" id="resultOfCreation">
 	
 	</p>
 	
-	<h1>List of Users</h1>
+	<h1 class="admin-user-list">List of Users</h1>
     <ul>
         <% users.forEach(user=> { %>
-            <li>
-                <a href="/editUser?username=<%= user.username %>"> <%= user.username %> by <%= user.role %> </a>
+            <li class="admin-user-item">
+                <a class="admin-user-link" href="/editUser?username=<%= user.username %>"> <%= user.username %> by <%= user.role %> </a>
             </li>
             <% }); %>
     </ul>
-	
-	
-	<h1>List of Channels</h1>
-	<div id="renderList">
-	
+	</div>
+
+	<div class="admin-right-column">
+		<h1 class="admin-section-title">List of Channels</h1>
+		<div class ="admin-channel-list" id="renderList">
+	</div>
 		
 	</div>
-	
+</div>
 	<script>
 	 	const formEl = document.querySelector('.form');
         
