@@ -25,6 +25,28 @@ body {
     max-width: 400px;
     text-align: center;
     animation: fadeIn 0.5s ease-in-out;
+    position: relative;
+    padding-top: 3rem;
+}
+
+.Home-Button {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    padding: 0.5rem 1rem;
+    background: #6a11cb;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-decoration: none;
+    display: inline-block;
+}
+
+.Home-Button:hover {
+    background: #2575fc;
 }
 
 h2 {
@@ -43,7 +65,7 @@ label {
     display: block;
     margin-bottom: 0.5rem;
     font-weight: bold;
-    color: #555;
+    color: #fff;
 }
 
 input[type="text"],

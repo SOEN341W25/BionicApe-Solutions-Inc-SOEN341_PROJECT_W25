@@ -40,6 +40,16 @@ app.use(session({
 // MAIN PAGE ROUTES
 //=====================
 
+// Showing home page
+app.get("", function (req, res) {
+  res.render("home");
+});
+
+app.get("/home", function (req, res) {
+  res.render("home");
+});
+
+
 // Showing secret page
 app.get("/secret", isLoggedIn, function (req, res) {
   res.render("secret");
@@ -163,6 +173,7 @@ app.get("/logout", function (req, res) {
 
 // Handling user signup
 app.post('/register', async (req, res) => {
+  const { username, password, isAdminCheckbox, admin_pass } = req.body;
   const existingUsername = await User.findOne({username: req.body.username});
   if (existingUsername) {
     return res.status(400).render("signup", { error: "Username already exists. Please try a different username." });
