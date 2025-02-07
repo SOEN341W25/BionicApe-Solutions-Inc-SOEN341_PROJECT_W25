@@ -177,6 +177,11 @@ app.get("/login", function (req, res) {
   res.render("login");
 });
 
+//Showing login form
+app.get("/channels", function (req, res) {
+  res.render("channels");
+});
+
 //Handling user logout 
 app.get("/logout", function (req, res) {
   console.log("Current session destroyed: "+ req.session.user)
@@ -240,7 +245,7 @@ app.post("/login", async (req, res) =>{
             res.redirect('/adminPage'); 
           }
           else {
-            res.status(200).json({status:"Logged in"})
+            res.redirect('/channels');
           }
 
         } else {
