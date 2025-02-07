@@ -10,7 +10,7 @@ const path=require('path');//include path library for combining path together
 require('./database/db');   
 const User = require("./model/User");
 const Channel = require("./model/Channel");
-const bcrypt = require("bcrypt");
+//const bcrypt = require("bcrypt");
 //============================
 //SETUP EXPRESS
 //============================
@@ -55,7 +55,7 @@ app.get("/secret", isLoggedIn, function (req, res) {
   res.render("secret");
 });
 
-app.get("/adminPage", isLoggedIn, async function (req, res) {
+app.get("/adminPage", isAdmin, async function (req, res) {
   // retrieve all users and pass it to the html
   var users = await User.find({});//users is the array of users
   console.log(JSON.stringify(users))
@@ -72,6 +72,14 @@ app.get("/editUser", isLoggedIn, async function (req, res) {
 
 
 
+app.get("/editChannel", isLoggedIn, async function (req, res) {
+  // retrieve all users and pass it to the html
+  var channel = await Channel.findOne({ channelName: req.query.channelName });
+  console.log(JSON.stringify(channel))
+  res.render("editChannel",{channel});
+});
+
+
 
 //=====================
 // REST API FOR DATA
@@ -81,6 +89,12 @@ app.get("/editUser", isLoggedIn, async function (req, res) {
 app.get("/api/user/:username", async function (req, res){
   user=await User.findOne({username: req.params.username});
   res.status(200).json(user);
+});
+
+app.put("/api/user/:username", async function (req, res){
+  user=await User.findOneAndUpdate({username: req.params.username},{role:req.body.role});
+  res.status(200).json(user);
+  
 });
 
 app.get("/api/user", async function (req,res){
@@ -181,7 +195,7 @@ app.post('/register', async (req, res) => {
 
   // Check if the user is trying to register as an admin
   const isAdmin = isAdminCheckbox === 'on'; // Checkbox value is 'on' when checked
-
+	console.log(isAdminCheckbox);
   // Validate admin password if the user claims to be an admin
   if (isAdmin) {
       const correctAdminPassword = "PETERGRIFFIN2025";
@@ -190,7 +204,7 @@ app.post('/register', async (req, res) => {
           return res.status(400).render('register', { error: "Incorrect admin password. Please try again." });
       }
   }
-
+	console.log(isAdmin);
   // If the admin password is correct (or the user is not an admin), proceed with registration
   try {
       const newUser = await User.create({
@@ -248,6 +262,38 @@ function isLoggedIn(req, res, next) {
   else{
     res.redirect("/login");//not an api call and not authorized, request for a html page so we send them back to the log in page because there not logged in
   }
+}
+
+async function isAdmin(req,res,next){
+  // is logged in
+  if(req.session.user){
+    const user = await User.findOne({ username: req.session.user });
+    if (user) {
+      //check if password matches
+      const result =  user.role === "admin";
+      if(result)
+      {
+        console.log("User has admin role ");
+        return next();
+      }
+      else
+      {
+        console.log("Redirect to channel page for normal users");
+        res.redirect("/channel");// channel page for normal users
+      }
+    }
+    else
+    {
+      console.log("Can't find current user session in database");
+      res.redirect("/login");// channel page for normal users
+    }
+  }
+  else
+  {
+    console.log("User has not logged in");
+    res.redirect("/login");
+  }
+
 }
 
 //=====================

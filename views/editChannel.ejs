@@ -1,0 +1,120 @@
+<h1>This is edit channel page of <%= channel.channelName %> </h1>
+
+<h2>Current Users in Channel</h2>
+<div id="currentListOfUsers">
+</div>    
+
+
+<h2>List of Users To Be Updated</h2>
+
+<form class ="form" id="renderList">
+
+</form>
+<p id="resultOfCreation">
+
+<script>
+
+
+        displayAllUserInCurrentChannel();
+        displayAllUser();
+		
+		function createList(data){
+					clearBox('renderList')
+					
+                    const formEl = document.querySelector('.form');
+					data.forEach(renderProductList);
+                    var button = document.createElement('button');
+                    button.setAttribute("type","submit");
+                    button.innerHTML = "Submit";
+                    formEl.appendChild(button);
+
+					function renderProductList(element, index, arr) {
+						var input = document.createElement('input');
+						input.setAttribute('type','checkbox');
+                        input.setAttribute('value',element.username);
+                        input.setAttribute('id',element.username);
+                        input.setAttribute('class','inp');
+
+						formEl.appendChild(input);
+
+                        var label = document.createElement('label')
+                        label.setAttribute('for',element.username);
+                        label.innerHTML = element.username;
+						
+                        formEl.appendChild(label);
+
+                        var br = document.createElement('br')
+                        formEl.appendChild(br);
+						
+					}
+		}
+		function createListUserInChannel(data){
+            clearBox('currentListOfUsers')
+            var myDiv = document.getElementById("currentListOfUsers")
+            var ul = document.createElement('ul');
+            ul.setAttribute('id','proList');
+            myDiv.appendChild(ul);
+
+            data.users.forEach(renderProductList);
+            function renderProductList(element, index, arr) {
+                var li = document.createElement('li');
+                li.setAttribute('class','item');
+                li.innerHTML = element
+                ul.appendChild(li);
+                
+            }
+        }
+		
+		function displayAllUser() {
+		   fetch("/api/user")
+			.then((res)=> res.json())
+			.then((data)=>{
+				createList(data);
+
+			})
+			.catch(console.error);
+		}
+
+        function displayAllUserInCurrentChannel() {
+		   fetch("/api/channel/<%= channel.channelName %>")
+			.then((res)=> res.json())
+			.then((data)=>{
+                console.log(JSON.stringify(data))
+				createListUserInChannel(data);
+
+			})
+			.catch(console.error);
+		}
+
+
+		function clearBox(elementID)
+		{
+    		document.getElementById(elementID).innerHTML = "";
+		}
+
+
+        const formEl = document.querySelector('.form');
+        
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();//prevent from refreshing page on submit
+            const checkedValues = [...document.querySelectorAll('.inp:checked')].map(e=>e.value);
+            var data = {users:checkedValues};
+
+            fetch('/api/channel/<%= channel.channelName %>',{
+                method: 'PUT',//used to create a new resource on the server
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then((res)=>res.json())
+                .then((data)=>{
+                   document.getElementById("resultOfCreation").innerHTML = "updated";
+                   displayAllUserInCurrentChannel();
+                })
+                .catch(console.error);
+        });
+
+
+
+</script>

@@ -1,7 +1,17 @@
 <h1>This is admin page</h1>
 
 <body>
-    <h1>List of Users</h1>
+	<form class ="form">
+			<input type="text" name="channelName" 
+			placeholder="channelName"/>
+		<button type="submit">create</button>
+	</form>
+    
+	<p id="resultOfCreation">
+	
+	</p>
+	
+	<h1>List of Users</h1>
     <ul>
         <% users.forEach(user=> { %>
             <li>
@@ -9,4 +19,80 @@
             </li>
             <% }); %>
     </ul>
+	
+	
+	<h1>List of Channels</h1>
+	<div id="renderList">
+	
+		
+	</div>
+	
+	<script>
+	 	const formEl = document.querySelector('.form');
+        
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();//prevent from refreshing page on submit
+            const formData = new FormData(formEl);//goal: to send to the server a JSON object with user name and pw
+            const data = Object.fromEntries(formData);//the func Obj.fromEntries requires a formData type and is stored to data
+            
+            fetch('/api/channel',{
+                method: 'POST',//used to create a new resource on the server
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then((res)=>res.json())
+                .then((data)=>{
+                   document.getElementById("resultOfCreation").innerHTML = "created";
+				   displayAllChannel();
+                })
+                .catch(console.error);
+        });
+		
+		displayAllChannel();
+		
+		function createList(data){
+					clearBox('renderList')
+					var ul = document.createElement('ul');
+					ul.setAttribute('id','proList');
+					
+
+					document.getElementById('renderList').appendChild(ul);
+					data.forEach(renderProductList);
+
+					function renderProductList(element, index, arr) {
+						var li = document.createElement('li');
+						li.setAttribute('class','item');
+
+						ul.appendChild(li);
+						
+						var a = document.createElement('a');
+						a.innerHTML=a.innerHTML + element.channelName;
+						a.setAttribute('href','/editChannel?channelName='+ element.channelName);
+						li.appendChild(a);
+
+						
+					}
+		}
+		
+		
+		function displayAllChannel() {
+		   fetch("/api/channel")
+			.then((res)=> res.json())
+			.then((data)=>{
+				createList(data);
+
+			})
+			.catch(console.error);
+		}
+		
+		function clearBox(elementID)
+		{
+    		document.getElementById(elementID).innerHTML = "";
+		}
+
+	</script>
+	
+	
 </body>  

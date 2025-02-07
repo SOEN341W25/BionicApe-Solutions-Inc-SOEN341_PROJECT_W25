@@ -1,3 +1,53 @@
 <h1>This is edit user page of <%= user.username %> </h1>
+<h2>Current Role</h2>
+<p id="currentRole"></p>
 
 
+<h1>Edit role</h1>
+<form class ="form">
+    <input type="text" name="role" 
+    placeholder="changeRole"/>
+<button type="submit">submit</button>
+</form>
+
+<p id="resultOfCreation"></p>
+
+<script>
+    displayCurrentUser();
+	 const formEl = document.querySelector('.form');
+        
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();//prevent from refreshing page on submit
+            const formData = new FormData(formEl);//goal: to send to the server a JSON object with user name and pw
+            const data = Object.fromEntries(formData);//the func Obj.fromEntries requires a formData type and is stored to data
+            
+            fetch('/api/user/<%= user.username %>',{
+                method: 'PUT',//used to create a new resource on the server
+                headers:{
+                    'Content-Type':'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then((res)=>res.json())
+                .then((data)=>{
+                   document.getElementById("resultOfCreation").innerHTML = "updated";
+                   displayCurrentUser();
+                })
+                .catch(console.error);
+        });
+
+        function displayCurrentUser() {
+		   fetch("/api/user/<%= user.username %>")
+			.then((res)=> res.json())
+			.then((data)=>{
+                console.log(JSON.stringify(data))
+				document.getElementById("currentRole").innerHTML=data.role;
+
+			})
+			.catch(console.error);
+		}
+
+
+
+
+</script>
