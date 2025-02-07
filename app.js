@@ -245,7 +245,6 @@ app.post("/login", async (req, res) =>{
           }
           else {
             res.redirect('/channels');
-            res.redirect('/channels');
           }
 
         } else {
