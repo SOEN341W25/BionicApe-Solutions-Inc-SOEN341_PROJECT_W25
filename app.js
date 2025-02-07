@@ -42,11 +42,11 @@ app.use(session({
 
 // Showing home page
 app.get("", function (req, res) {
-  res.render("home");
+  res.render("index");
 });
 
-app.get("/home", function (req, res) {
-  res.render("home");
+app.get("/index", function (req, res) {
+  res.render("index");
 });
 
 
@@ -150,7 +150,7 @@ app.delete("/api/channel/:channelName", async function (req, res){
 
 // Showing home page
 app.get("", function (req, res) {
-  res.render("home");
+  res.render("index");
 });
 
 // Showing register form
