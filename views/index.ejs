@@ -6,6 +6,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ChatHaven - Seamless Communication</title>
+    <link rel="icon" href="/favicon.ico"/>
     <style>
         /* Basic Reset */
         * {
@@ -119,6 +120,27 @@
             transform: translateY(0);
             }
         }
+
+        /* The Cool Squares */
+        .square {
+            position: absolute;
+            background-color: rgba(0, 174, 255, 0.568);
+            width: 20px;
+            height: 20px;
+            opacity: 0.6;
+            z-index: -1;
+        }
+
+        @keyframes flyRight {
+            from {
+                transform: translateX(0);
+                opacity: 1;
+            }
+            to {
+                transform: translateX(100vw);
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -144,5 +166,32 @@
             <p>Simple and intuitive interface for everyone.</p>
         </div>
     </div>
+
+    <!-- squares animation-->
+    <script>
+        function createSquare() {
+            const square = document.createElement("div");
+            square.classList.add("square");
+
+            let size = Math.random() * 30 + 10;
+            square.style.width = `${size}px`;
+            square.style.height = `${size}px`;
+
+            square.style.left = "0px";
+            square.style.top = `${Math.random() * 95}vh`;
+            let duration = Math.random() * 4 + 2;
+            square.style.animation = `flyRight ${duration}s linear infinite`;
+
+            document.body.appendChild(square);
+
+
+            setTimeout(() => {
+                square.remove();
+            }, duration * 900);
+        }
+
+        setInterval(createSquare, 200);
+    </script>
+
 </body>
 </html>
