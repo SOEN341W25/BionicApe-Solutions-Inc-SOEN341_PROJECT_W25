@@ -17,6 +17,7 @@
     "express": "^4.21.2",
     "express-session": "^1.18.1",
     "mongoose": "^8.9.5",
-    "my-node-project": "file:"
+    "my-node-project": "file:",
+    "nodemon": "^3.1.9"
   }
 }

@@ -239,12 +239,12 @@ app.post("/login", async (req, res) =>{
         if (result) {
           req.session.user=req.body.username;//to log in
           console.log("Set Current Session variable:" +req.session.user)
-          
           // res.status(200).json({status:"Logged in"})// ask user to change html page
           if(user.role === "Admin"){
             res.redirect('/adminPage'); 
           }
           else {
+            res.redirect('/channels');
             res.redirect('/channels');
           }
 

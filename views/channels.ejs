@@ -15,6 +15,11 @@
             top: 0;
             padding-top: 20px;
             color: white;
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .sidebar.collapsed {
+            transform: translateX(-250px);
         }
 
         .sidebar a {
@@ -26,15 +31,35 @@
         .sidebar a:hover {
             background-color: #6a11cb;
         }
+
+        .toggle-btn {
+            position: fixed;
+            left: 260px; /* Adjust based on sidebar width */
+            top: 20px;
+            background-color: #2575fc;
+            color: white;
+            border: none;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1000;
+        }
+
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
     </style>
 </head>
 <body>
-    <div class="sidebar">
+    <button class="toggle-btn" onclick="toggleSidebar()">Sidenav</button>
+
+    <div class="sidebar" id="sidebar">
         <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar p-3">
-            <div class="text-center mb-3">
-                <img src="logo.png" alt="Logo" class="img-fluid" style="max-width: 80px;">
-            </div>
-            <h5 class="text-center">Object List</h5>
+            <div class="logo-container">
+                <img src="/bionicape.png" alt="Logo" class="img-fluid center" style="max-width: 80px;">
+            </div><br><br>
+            <h5 class="text-center">List of your Channels</h5>
             <ul class="nav flex-column">
                 <li><a href="#">EXAMPLE CHANNEL</a></li>
             </ul>
@@ -46,5 +71,11 @@
         </main>
     </div>
 
+    <script>
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            sidebar.classList.toggle('collapsed');
+        }
+    </script>
 </body>
 </html>
