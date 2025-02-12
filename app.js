@@ -22,7 +22,8 @@ app.use(express.static(path.join(__dirname,'public')));
 
 app.set("view engine", "ejs");//setup view engine ejs
 app.set('views', path.join(__dirname, 'views'));
-var bodyParser=require('body-parser')//support data payload for post requests
+var bodyParser=require('body-parser');//support data payload for post requests
+const { channel } = require("diagnostics_channel");
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -86,11 +87,13 @@ app.get("/editChannel", isLoggedIn, async function (req, res) {
 //=====================
 
 //HTTP FOR USER
-app.get("/api/user/:username", async function (req, res){
+//Todo maybe change me
+app.get("/api/user/getuser/:username", async function (req, res){
   user=await User.findOne({username: req.params.username});
   res.status(200).json(user);
 });
 
+//Todo might need to change it
 app.put("/api/user/:username", async function (req, res){
   user=await User.findOneAndUpdate({username: req.params.username},{role:req.body.role});
   res.status(200).json(user);
@@ -103,31 +106,35 @@ app.get("/api/user", async function (req,res){
 
 });
 
+//This gets all channels by username (good for users)
+app.get("/api/user/channels", isLoggedIn, async function(req, res){
+  const user = req.user
+  channels=await Channel.find({users: user});
+  return res.status(200).json(channels)
+});
+
+
 //HTTP FOR CHANNEL
 //This one retrieves single channel by channel name
 app.get("/api/channel/:channelName",async function (req, res){
   channel=await Channel.findOne({channelName: req.params.channelName});
   res.status(200).json(channel);
 });
-//This one gets all channels (good for admin)
-app.get("/api/channel", async function (req,res){
+//This one gets all channels (good for admin) //Todoi might
+app.get("/api/channel", isAdmin ,async function (req,res){
   channels=await Channel.find({});
-  res.status(200).json(channels);
-});
-//This gets all channels by username (good for users)
-app.get("/api/channel/user/:username", async function(req, res){
-  channels=await Channel.find({users:req.params.username});
   res.status(200).json(channels);
 });
 
 //This one creates a channel by username (good for admin page)
-app.post("/api/channel", async function (req, res){
+app.post("/api/channel" , async function (req, res){
   console.log("Inside post channel"+req.body.channelName);
   const channel = await Channel.findOne({channelName: req.body.channelName});
 if(!channel)
 {
   const newChannel = await Channel.create({
-    channelName: req.body.channelName
+    channelName: req.body.channelName,
+    users: [req.session.user]
   });
   return res.status(200).json(newChannel);
 }
@@ -177,7 +184,7 @@ app.get("/login", function (req, res) {
   res.render("login");
 });
 
-//Showing login form
+//Showing channel form
 app.get("/channels", function (req, res) {
   res.render("channels");
 });
@@ -259,11 +266,12 @@ app.post("/login", async (req, res) =>{
 });
 
 
-//Function used to check if session is still valid
+//Function used to check if session is still valid (if the user is logged in)
 function isLoggedIn(req, res, next) {
   const sessionUser=req.session.user || 'No session set';
   if(req.session.user){
     console.log("Current session variable: "+sessionUser)
+    req.user = sessionUser
     return next();
   }
   console.log("Current session variable: "+sessionUser)
