@@ -32,6 +32,16 @@
             background-color: #6a11cb;
         }
 
+        a[href="http://localhost:3000/api/user/channels"] {
+            
+            display: block;
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            background-color: red;
+        }
+       
+
         .toggle-btn {
             position: fixed;
             left: 260px; /* Adjust based on sidebar width */
@@ -76,7 +86,10 @@
     <form class ="form">
         <input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
     <button class="admin-btn" type="submit">create</button>
+    
     <a href="http://localhost:3000/api/user/channels" target="_blank">This is a link to see existing channels</a> <!-- Make a fronbtend page for this, ask Mathis-->
+    
+    
     </form>
     <script>
         function toggleSidebar() {
