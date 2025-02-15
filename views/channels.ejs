@@ -32,14 +32,14 @@
             background-color: #6a11cb;
         }
 
-        a[href="http://localhost:3000/api/user/channels"] {
+        /* a[href="http://localhost:3000/api/user/channels"] {
             
             display: block;
             color: white;
             padding: 15px 20px;
             text-decoration: none;
             background-color: red;
-        }
+        } */
        
 
         .toggle-btn {
@@ -63,6 +63,7 @@
     </style>
 </head>
 <body>
+<!-- -->
     <button class="toggle-btn" onclick="toggleSidebar()">Sidenav</button>
 
     <a class="logout-btn" href="/logout">Logout</a>
@@ -73,8 +74,19 @@
                 <img src="/bionicape.png" alt="Logo" class="img-fluid center" style="max-width: 80px;">
             </div><br><br>
             <h5 class="text-center">List of your Channels</h5>
-            <ul class="nav flex-column">
+            <ul class="nav flex-column" id="renderList">
                 <li><a href="#">EXAMPLE CHANNEL</a></li>
+
+                <li>
+                    <form class ="form">
+                        <input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
+                    <button class="admin-btn" type="submit">Create</button> 
+                    
+                    <a href="http://localhost:3000/api/user/channels" target="_blank"><i>This is a link to see existing channels</i></a> <!-- Make a fronbtend page for this, ask Mathis-->
+                    
+                    </form>
+                </li>
+
             </ul>
         </nav>
         
@@ -83,14 +95,8 @@
             <p>This is the main content area.</p>
         </main>
     </div>
-    <form class ="form">
-        <input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
-    <button class="admin-btn" type="submit">create</button>
-    
-    <a href="http://localhost:3000/api/user/channels" target="_blank">This is a link to see existing channels</a> <!-- Make a fronbtend page for this, ask Mathis-->
-    
-    
-    </form>
+<!-- -->
+
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
@@ -117,13 +123,13 @@
             .catch(err => console.log(err));
         });
 
-        displayAllChannel();
+        displayAllChannel("renderList");
 
-        function createList(data) {
-            clearBox('renderList');
+        function createList(data, list_id) {
+            clearBox(list_id);
             const ul = document.createElement('ul');
             ul.setAttribute('id', 'proList');
-            document.getElementById('renderList').appendChild(ul);
+            document.getElementById(list_id).appendChild(ul);
 
             data.forEach(element => {
                 const li = document.createElement('li');
@@ -137,11 +143,11 @@
             });
         }
 
-        function displayAllChannel() {
+        function displayAllChannel(list_id) {
             fetch("/api/channel")
                 .then(res => res.json())
                 .then(data => {
-                    createList(data);
+                    createList(data, list_id);
                 })
                 .catch(console.error);
         }

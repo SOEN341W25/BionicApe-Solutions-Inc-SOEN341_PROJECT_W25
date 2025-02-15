@@ -107,17 +107,21 @@ app.get("/api/user", async function (req,res){
 });
 
 //This gets all channels by username (good for users)
-app.get("/api/user/channels", isLoggedIn, async function(req, res){
-  const user = req.user
-  channels=await Channel.find({users: user});
-  return res.status(200).json(channels)
+app.get("/api/user/channels", isLoggedIn, async function (req, res) {
+  const user = req.user;
+  const channels = await Channel.find({ users: user });
+
+  console.log("Channels fetched:", channels); // Debugging
+
+  res.render("channel_list", { channels });
 });
+
 
 
 //HTTP FOR CHANNEL
 //This one retrieves single channel by channel name
 app.get("/api/channel/:channelName",async function (req, res){
-  channel=await Channel.findOne({channelName: req.params.channelName});
+  var channel=await Channel.findOne({channelName: req.params.channelName});
   res.status(200).json(channel);
 });
 //This one gets all channels (good for admin) //Todoi might
