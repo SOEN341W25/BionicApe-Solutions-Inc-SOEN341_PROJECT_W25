@@ -13,7 +13,6 @@ ChatHaven solves these challenges by offering a user-friendly platform that supp
 * Levon Tavitian : Backend Developer, Sprint #1 Scrum Master
 * Mathis Vuong : Backend Developer
 
-| 
 
 ## Requirements
 
