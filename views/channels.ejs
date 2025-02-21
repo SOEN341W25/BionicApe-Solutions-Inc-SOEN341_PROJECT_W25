@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -28,6 +29,7 @@
             padding: 15px 20px;
             text-decoration: none;
         }
+
         .sidebar a:hover {
             background-color: #6a11cb;
         }
@@ -40,11 +42,12 @@
             text-decoration: none;
             background-color: red;
         } */
-       
+
 
         .toggle-btn {
             position: fixed;
-            left: 260px; /* Adjust based on sidebar width */
+            left: 260px;
+            /* Adjust based on sidebar width */
             top: 20px;
             background-color: #2575fc;
             color: white;
@@ -59,11 +62,11 @@
             justify-content: center;
             width: 100%;
         }
-       
     </style>
 </head>
+
 <body>
-<!-- -->
+    <!-- -->
     <button class="toggle-btn" onclick="toggleSidebar()">Sidenav</button>
 
     <a class="logout-btn" href="/logout">Logout</a>
@@ -73,37 +76,44 @@
             <div class="logo-container">
                 <img src="/bionicape.png" alt="Logo" class="img-fluid center" style="max-width: 80px;">
             </div><br><br>
-            <h5 class="text-center">List of your Channels</h5>
+
+            <form class="form">
+                <h3 style="color: black; font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Create a Channel:</h3><br>
+                <input class="admin-input" type="text" name="channelName" id="channelName"
+                    placeholder="Enter name of channel" />
+                <button class="admin-btn" type="submit">Create</button>
+            </form>
+
+            <br><br>
+            <h3 class="text-center" style="color: black; font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">List of your Channels:</h3>
             <ul class="nav flex-column" id="renderList">
-                <li><a href="#">EXAMPLE CHANNEL</a></li>
-
-                <li>
-                    <form class ="form">
-                        <input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
-                    <button class="admin-btn" type="submit">Create</button> 
-                    
-                    <a href="http://localhost:3000/api/user/channels" target="_blank"><i>This is a link to see existing channels</i></a> <!-- Make a fronbtend page for this, ask Mathis-->
-                    
-                    </form>
-                </li>
-
+                <% if (channels && channels.length> 0) { %>
+                    <% channels.forEach(channel=> { %>
+                        <li><a href="#">
+                                <%= channel.channelName %>
+                            </a></li>
+                        <% }) %>
+                            <% } else { %>
+                                <li>No channels found.</li>
+                                <% } %>
             </ul>
         </nav>
-        
+
         <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
             <h1>Welcome</h1>
             <p>This is the main content area.</p>
         </main>
     </div>
-<!-- -->
+    <!-- -->
 
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
             sidebar.classList.toggle('collapsed');
         }
+
         const formEl = document.querySelector('.form');
-        
+
         formEl.addEventListener('submit', event => {
             event.preventDefault();
             const formData = new FormData(formEl);
@@ -116,45 +126,41 @@
                 },
                 body: JSON.stringify(data)
             })
-            .then(res => res.json())
-            .then(data => {
-                displayAllChannel();
-            })
-            .catch(err => console.log(err));
-        });
-
-        displayAllChannel("renderList");
-
-        function createList(data, list_id) {
-            clearBox(list_id);
-            const ul = document.createElement('ul');
-            ul.setAttribute('id', 'proList');
-            document.getElementById(list_id).appendChild(ul);
-
-            data.forEach(element => {
-                const li = document.createElement('li');
-                li.setAttribute('class', 'item');
-                ul.appendChild(li);
-
-                const a = document.createElement('a');
-                a.innerHTML = element.channelName;
-                a.setAttribute('href', '/editChannel?channelName=' + element.channelName);
-                li.appendChild(a);
-            });
-        }
-
-        function displayAllChannel(list_id) {
-            fetch("/api/channel")
                 .then(res => res.json())
                 .then(data => {
-                    createList(data, list_id);
+                    displayAllChannel(); // Refresh the list of channels
                 })
-                .catch(console.error);
+                .catch(err => console.log(err));
+        });
+
+        function displayAllChannel() {
+            fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
+                .then(res => res.json())
+                .then(channels => {
+                    const renderList = document.getElementById('renderList');
+                    renderList.innerHTML = ''; // Clear the current list
+
+                    if (channels && channels.length > 0) {
+                        channels.forEach(channel => {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = '#';
+                            a.textContent = channel.channelName;
+                            li.appendChild(a);
+                            renderList.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.textContent = 'No channels found.';
+                        renderList.appendChild(li);
+                    }
+                })
+                .catch(err => console.log(err));
         }
 
-        function clearBox(elementID) {
-            document.getElementById(elementID).innerHTML = "";
-        }
+        // Call displayAllChannel on page load to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllChannel);
     </script>
 </body>
+
 </html>

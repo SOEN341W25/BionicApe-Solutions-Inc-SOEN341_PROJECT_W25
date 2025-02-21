@@ -189,8 +189,14 @@ app.get("/login", function (req, res) {
 });
 
 //Showing channel form
-app.get("/channels", function (req, res) {
-  res.render("channels");
+app.get("/channels", async (req, res) => {
+  try {
+    const channels = await Channel.find({});
+    res.render("channels", { channels });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "An error occurred while fetching channels." });
+  }
 });
 
 //Handling user logout 

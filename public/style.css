@@ -183,6 +183,8 @@ a:hover {
 
 #renderlist {
     overflow: auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    color: #333;
     max-height: 500px;
 }
 
@@ -207,16 +209,16 @@ a:hover {
 }
 
 .admin-btn {
+    margin-left: 75px;
     padding: 0.75rem 1.5rem;
-    background-color: #2575fc;
+    background-color: #6a11cb;
     color: white;
-    border: none;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .admin-btn:hover {
-    background-color: #6a11cb;
+    background-color: #2575fc;
 }
 
 .admin-result {
