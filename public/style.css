@@ -211,14 +211,14 @@ a:hover {
 .admin-btn {
     margin-left: 75px;
     padding: 0.75rem 1.5rem;
-    background-color: #6a11cb;
+    background-color: #03358b;
     color: white;
     border-radius: 5px;
     cursor: pointer;
 }
 
 .admin-btn:hover {
-    background-color: #2575fc;
+    background-color: #0048c5;
 }
 
 .admin-result {

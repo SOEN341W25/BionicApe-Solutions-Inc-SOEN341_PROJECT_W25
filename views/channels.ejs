@@ -10,7 +10,7 @@
         .sidebar {
             width: 250px;
             height: 100vh;
-            background-color: #2575fc;
+            background-color: #003fab;
             position: fixed;
             left: 0;
             top: 0;
@@ -28,10 +28,13 @@
             color: white;
             padding: 15px 20px;
             text-decoration: none;
+            border: 1px none rgb(0, 0, 0);
+            border-radius: 10px;
+            margin-bottom: 2px
         }
 
         .sidebar a:hover {
-            background-color: #6a11cb;
+            background-color: #002d7b;
         }
 
         /* a[href="http://localhost:3000/api/user/channels"] {
@@ -49,14 +52,21 @@
             left: 260px;
             /* Adjust based on sidebar width */
             top: 20px;
-            background-color: #2575fc;
+            background-color: #003fab;
             color: white;
             border: none;
+            border-radius: 10px;
             padding: 10px;
             cursor: pointer;
             z-index: 1000;
+            transition: left 0.3s ease-in-out;
         }
 
+        .toggle-btn:hover{
+            background-color: #002d7b;
+        }
+
+        
         .logo-container {
             display: flex;
             justify-content: center;
@@ -78,14 +88,14 @@
             </div><br><br>
 
             <form class="form">
-                <h3 style="color: black; font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">Create a Channel:</h3><br>
+                <h3 style="color: rgb(255, 255, 255); font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin-left: 5px;">Create a Channel:</h3><br>
                 <input class="admin-input" type="text" name="channelName" id="channelName"
                     placeholder="Enter name of channel" />
                 <button class="admin-btn" type="submit">Create</button>
             </form>
 
             <br><br>
-            <h3 class="text-center" style="color: black; font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;">List of your Channels:</h3>
+            <h3 class="text-center" style="color: rgb(255, 255, 255); font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin-left: 5px;">List of your Channels:</h3>
             <ul class="nav flex-column" id="renderList">
                 <% if (channels && channels.length> 0) { %>
                     <% channels.forEach(channel=> { %>
@@ -109,8 +119,17 @@
     <script>
         function toggleSidebar() {
             const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
             sidebar.classList.toggle('collapsed');
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
+            } else {
+                toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
+            }
         }
+
 
         const formEl = document.querySelector('.form');
 
