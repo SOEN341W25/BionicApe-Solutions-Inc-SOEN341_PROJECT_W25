@@ -87,7 +87,9 @@ app.get("/editChannel", isLoggedIn, async function (req, res) {
 //=====================
 
 //HTTP FOR USER
-//Todo maybe change me
+//It should be /api/user/:username
+//because in best practice standard rest api, we do not use verbs 
+//it should be a link to resources 
 app.get("/api/user/getuser/:username", async function (req, res){
   user=await User.findOne({username: req.params.username});
   res.status(200).json(user);
@@ -106,27 +108,17 @@ app.get("/api/user", async function (req,res){
 
 });
 
-//This gets all channels by username (good for users)
-app.get("/api/user/channels", isLoggedIn, async function (req, res) {
-  const user = req.user;
-  const channels = await Channel.find({ users: user });
-
-  console.log("Channels fetched:", channels); // Debugging
-
-  res.render("channel_list", { channels });
-});
-
 
 
 //HTTP FOR CHANNEL
 //This one retrieves single channel by channel name
 app.get("/api/channel/:channelName",async function (req, res){
-  var channel=await Channel.findOne({channelName: req.params.channelName});
+  let channel=await Channel.findOne({channelName: req.params.channelName});
   res.status(200).json(channel);
 });
 //This one gets all channels (good for admin) //Todoi might
-app.get("/api/channel", isAdmin ,async function (req,res){
-  channels=await Channel.find({});
+app.get("/api/channel", async function (req,res){
+   let channels=await Channel.find({});
   res.status(200).json(channels);
 });
 
@@ -150,16 +142,25 @@ else
 });
 //This one modifies the channel by providing the username
 app.put("/api/channel/:channelName", async function (req,res){
-  channel=await Channel.findOneAndUpdate({channelName: req.params.channelName},{users:req.body.users});
+ let channel=await Channel.findOneAndUpdate({channelName: req.params.channelName},{users:req.body.users});
   res.status(200).json(channel);
 });
 //This one deletes the channel by channel name
 app.delete("/api/channel/:channelName", async function (req, res){
-  channel=await Channel.deleteOne({channelName: req.params.channelName});
+  let channel=await Channel.deleteOne({channelName: req.params.channelName});
   res.status(200).json(channel);
 });
 
-
+//This gets all channels by username (good for users), not accesible through postman for now
+//user and channel should be swapped since the database retrieves the entity channel.
+//Channel should have been first then user
+//Most popular website such as fb and all uses me to retrieve the current logged in session
+//So it should /api/channel/user/me
+app.get("/api/user/channels", isLoggedIn, async function (req, res) {
+  const user = req.session.user;
+  const channels = await Channel.find({ users: user });
+  return res.status(200).json(channels)
+});
 
 
 

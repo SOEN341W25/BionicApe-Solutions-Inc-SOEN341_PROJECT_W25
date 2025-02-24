@@ -142,28 +142,6 @@
 			"response": []
 		},
 		{
-			"name": "getChannelForACertainUser",
-			"request": {
-				"method": "GET",
-				"header": [],
-				"url": {
-					"raw": "http://localhost:3000/api/channel/user/admin",
-					"protocol": "http",
-					"host": [
-						"localhost"
-					],
-					"port": "3000",
-					"path": [
-						"api",
-						"channel",
-						"user",
-						"admin"
-					]
-				}
-			},
-			"response": []
-		},
-		{
 			"name": "getAllUser",
 			"request": {
 				"method": "GET",
@@ -178,6 +156,36 @@
 					"path": [
 						"api",
 						"user"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "putUser",
+			"request": {
+				"method": "PUT",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\"role\":\"Admin\"}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/user/admin",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"user",
+						"admin"
 					]
 				}
 			},
