@@ -7,7 +7,9 @@ var Channel = new Schema({
     channelName: {
         type: String
     },
-    
+    messageIds: [
+    {type: mongoose.Schema.Types.ObjectId, ref:'Message'}	
+    ],
     users: {
         type:[String]
     }

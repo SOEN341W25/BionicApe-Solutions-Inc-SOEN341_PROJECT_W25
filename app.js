@@ -4,18 +4,29 @@
 // REQUIRES (INCLUDES)
 //=====================
 const express = require("express");
-const session =require('express-session');//routing api library
 const path=require('path');//include path library for combining path together
+
+const { createServer }= require('node:http');
+const { join }=require('node:path');
+const { Server }= require('socket.io');
+
 
 require('./database/db');   
 const User = require("./model/User");
 const Channel = require("./model/Channel");
+const Message = require("./model/Message");
+const Counters = require("./model/Counters");
+const mongoose = require('mongoose')
+const { sessionMiddleware, wrap }=require("./session/serverController");
 //const bcrypt = require("bcrypt");
 //============================
 //SETUP EXPRESS
 //============================
 
 let app = express();
+const server =createServer(app);
+const io= new Server(server);
+
 
 //Set up static file serving
 app.use(express.static(path.join(__dirname,'public')));
@@ -31,11 +42,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //====================
 //SETUP USER SESSION MIDDLEWARE
 //====================
-app.use(session({
-  secret: 'chathaven-key',
-  resave:false,
-  saveUninitialized: true
-}));
+app.use(sessionMiddleware);
+io.use (wrap(sessionMiddleware));
+
 
 //=====================
 // MAIN PAGE ROUTES
@@ -112,11 +121,11 @@ app.get("/api/user", async function (req,res){
 
 //HTTP FOR CHANNEL
 //This one retrieves single channel by channel name
-app.get("/api/channel/:channelName",async function (req, res){
+/* app.get("/api/channel/:channelName",async function (req, res){
   let channel=await Channel.findOne({channelName: req.params.channelName});
   res.status(200).json(channel);
-});
-//This one gets all channels (good for admin) //Todoi might
+}); */
+//This one gets all channels (good for admin) 
 app.get("/api/channel", async function (req,res){
    let channels=await Channel.find({});
   res.status(200).json(channels);
@@ -158,11 +167,133 @@ app.delete("/api/channel/:channelName", async function (req, res){
 //So it should /api/channel/user/me
 app.get("/api/user/channels", isLoggedIn, async function (req, res) {
   const user = req.session.user;
-  const channels = await Channel.find({ users: user });
+  let adminRole = await isAdminCheck(req.session.user);
+  let queryJson = adminRole? {} : {users: user};
+  const channels = await Channel.find(queryJson);
   return res.status(200).json(channels)
 });
 
+//CHAT FEATURE
 
+// get history of channel when select channel
+app.get("/api/channel/:channelName", async function (req, res) {
+  // check if you are admin, if so, remove the match or {}??
+  //let adminRole = await isAdminCheck(req.session.user);
+  //let visibleJson = adminRole? {} : {visible: true};
+
+
+
+  let channel = await Channel.findOne({channelName:req.params.channelName}, {messageIds: { $slice: -5 }}) // show the last 5 messages
+      .populate({
+          path:'messageIds', 
+          match: {}
+          });
+  res.status(200).json(channel);
+});
+
+
+app.get("/api/user/userDMs/:username", async function (req, res) {
+  let userName=req.session.user;
+  let user = await User.findOne({ username: userName }, {'userDMs.messageIds': { $slice: -5 }})// show the last 5 messages
+       .populate({
+          path:'userDMs.messageIds'
+       });
+  res.status(200).json(user);
+});
+
+async function saveDmToDatabase(senderName, recipientName, message)
+{
+  let senderUsername = senderName;
+  let recipientUsername = recipientName;
+  let nextId = await preIncrement("messageId");
+  let newMessage = await Message.create({
+      messageId: nextId,
+      msg: message,
+      username: senderUsername
+  });
+
+  
+  // Find and update the sender's userDMs to push the messageId
+  const sender = await User.findOne({ username: senderUsername });
+  const recipient = await User.findOne({ username: recipientUsername });
+
+  // Ensure both sender and recipient exist
+  if (!sender || !recipient) {
+    throw new Error('Sender or recipient not found');
+  }
+
+  // Check if the sender already has an entry for the recipient in userDMs
+  const senderDM = sender.userDMs.find(dm => dm.recipientUser === recipientUsername);
+  if (!senderDM) {
+    // If no entry exists, add a new one for the recipient
+    sender.userDMs.push({ recipientUser: recipientUsername, messageIds: [newMessage._id] });
+  } else {
+    // If entry exists, just push the messageId into their messageIds array
+    senderDM.messageIds.push(newMessage._id);
+  }
+
+  // Check if the recipient already has an entry for the sender in userDMs
+  const recipientDM = recipient.userDMs.find(dm => dm.recipientUser === senderUsername);
+  if (!recipientDM) {
+    // If no entry exists, add a new one for the sender
+    recipient.userDMs.push({ recipientUser: senderUsername, messageIds: [newMessage._id] });
+  } else {
+    // If entry exists, just push the messageId into their messageIds array
+    recipientDM.messageIds.push(newMessage._id);
+  }
+
+  // Save both users after updating their userDMs
+  await sender.save();
+
+  // if you send to yourself, we save it only once
+  if(senderUsername != recipientUsername)
+  {
+    await recipient.save();        
+  }
+
+  
+  
+  return newMessage;
+}
+async function deleteMessageInDatabase(messageid, visibility){
+  let message = await Message.findOneAndUpdate(
+    {messageId:messageid},
+    {visible: visibility},
+    {new:true}//must be the new message
+);
+return message;
+};
+
+async function saveChannelMessageInDatabase(message, user, channelname){
+    let nextId = await preIncrement("messageId");
+    let newMessage = await Message.create({ // database query
+        messageId: nextId,
+        msg:message,
+        username:user
+
+    });
+    await Channel.findOneAndUpdate( // database query
+        {channelName:channelname},
+        {$push: {messageIds: newMessage._id}}, // push message id to the array of messageIds (newMessage._id this is the OBJECTID)
+        {new: true, upsert: true}
+    
+    );
+    return newMessage;
+} ;
+// usually, you would do global variable and you do ++
+// but if you turn off the application, it will restart
+// with database, the counter is remembered and the next time you start the application it will continue where it left off
+
+// the sequence name is the name of the counter (for us, we need message id counter in the database)
+async function preIncrement(sequenceName) {
+      let newCounter = await Counters.findByIdAndUpdate( // database query
+          {_id: sequenceName},
+          {$inc: {seq: 1}},
+          {new: true, upsert: true} // upsert its a fusion of two words: update or insert (create if not exist)
+      );
+      return newCounter.seq
+
+};
 
 
 
@@ -295,6 +426,18 @@ function isLoggedIn(req, res, next) {
   }
 }
 
+// non middleware
+async function isAdminCheck(userName)
+{
+  const user = await User.findOne({ username: userName});
+  let result = false;
+  if (user) {
+    //check if password matches
+     result =  user.role === "Admin";
+  }
+  return result;
+}
+
 async function isAdmin(req,res,next){
   // is logged in
   if(req.session.user){
@@ -326,11 +469,77 @@ async function isAdmin(req,res,next){
   }
 
 }
+//=====================
+// WEBSOCKET FUNCTION
+//=====================
+let usersocketmap = {};
+io.on('connection', (socket)=>{
+  console.log("connected!")
+  let userName=socket.request.session.user;
+  usersocketmap[userName] = socket.id;//put the username in the [] and it will return a socket id value
+//when you connect, you will have a key of the username and the value will be associated  the socket id (mapping)
+//a map is a list of key value
+//if admin logs in, it will have a socket id as the value, the key is admin
+//key=admin or user, value=socketid, a map is a list of key value
+  console.log(usersocketmap[userName]);
+
+
+  socket.on('channel message', async (msg, channelName)=>{
+    let userName=socket.request.session.user;
+    let newMessage= await saveChannelMessageInDatabase(msg, userName, channelName);
+      io.emit('channel message',newMessage, channelName);//backend will rebroadcast it to everyone 
+      console.log("sending msg! ",JSON.stringify(newMessage))
+  });
+
+  socket.on('dms to user', async (msg, currentRecipientUser)=>{
+    let userName=socket.request.session.user;
+    const senderSocketId=usersocketmap[userName];
+    const recipientSocketId=usersocketmap[currentRecipientUser];
+    console.log(senderSocketId);
+    console.log(recipientSocketId);
+    let newMessage= await saveDmToDatabase(userName, currentRecipientUser, msg);
+    if(senderSocketId)
+    {
+        io.to(senderSocketId).emit('dms to user', newMessage, currentRecipientUser);//only rebroadcast to the user that was dm
+        console.log("sent to sender socket with msg", newMessage, currentRecipientUser);
+    }
+    else
+    {
+      console.log("sender socket id does not exist");
+    }
+  
+
+    if(recipientSocketId && userName != currentRecipientUser)
+    {
+      io.to(recipientSocketId).emit('dms to user', newMessage, userName);//only rebroadcast to the user that was dm
+      console.log("sent to recipient socket with msg", newMessage, userName);
+    }
+    else
+    {
+      console.log("recipient socket id does not exist or sending to yourself");
+    }
+
+  });
+
+
+  socket.on('modify channel message', async (messageId, visibility)=>{
+    let adminRole = await isAdminCheck(socket.request.session.user);
+    if(!adminRole)
+    {
+      console.log("can't modify channel. not admin");
+      return
+    }
+
+    let messageToDelete=await deleteMessageInDatabase(messageId, visibility);
+      io.emit('modify channel message', messageToDelete, visibility);
+      console.log("deleting msg! ", JSON.stringify(messageToDelete))
+  })
+});
 
 //=====================
 // START SERVER LISTENER
 //=====================
 let port = process.env.PORT || 3000;
-app.listen(port, function () {
+server.listen(port, function () {
     console.log("Server Has Started!");
 });

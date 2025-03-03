@@ -15,7 +15,16 @@ var User = new Schema({
     },
     channels: {
         type:[String]
-    }
+    },
+    userDMs: [{
+    	recipientUser: {
+    		type:String
+    	},
+    	messageIds:[{
+    		type: mongoose.Schema.Types.ObjectId,
+    		ref: 'Message' //Reference to the Message model
+    		}]
+    	}]
 })
 
 //remove password when transforming to JSON. Don't want to send back to clients with password
