@@ -1,0 +1,597 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="script.js" defer></script>
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Poppins", sans-serif;
+    }
+
+    .sidebar {
+        position: fixed;
+        left: 0;
+        top: 0;
+        height: 100%;
+        width: 78px;
+        background: #5D3FD3;
+        padding: 6px 14px;
+        z-index: 1;
+        transition: all 0.5s ease;
+    }
+
+    .sidebar.open {
+        width: 250px;
+    }
+
+    .sidebar .logo-details {
+        height: 60px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        position: relative;
+    }
+
+    .sidebar .logo-details .logo_name {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        opacity: 0;
+        transition: all 0.5s ease;
+    }
+
+
+    .sidebar .logo-details .main_logo {
+        color: #fff;
+        font-size: 20px;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.5s ease 0.3s;
+        /* Delay only for opening */
+    }
+
+    .sidebar.open .logo-details .main_logo {
+        opacity: 1;
+    }
+
+    .sidebar:not(.open) .logo-details .main_logo {
+        transition: opacity 0.2s ease 0s;
+        /* No delay when closing, and faster transition */
+        opacity: 0;
+    }
+
+
+
+
+    .sidebar.open .logo-details,
+    .sidebar.open .logo-details .logo_name {
+        opacity: 1;
+    }
+
+    .sidebar .logo-details #btn {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        font-size: 22px;
+        text-align: center;
+        cursor: pointer;
+        transition: all 0.5s ease;
+    }
+
+    .sidebar.open .logo-details #btn {
+        text-align: center;
+    }
+
+    .sidebar i {
+        color: #fff;
+        height: 60px;
+        min-width: 50px;
+        font-size: 28px;
+        text-align: center;
+        line-height: 60px;
+    }
+
+    .sidebar .nav-list {
+        margin-top: 20px;
+        height: 100%;
+    }
+
+    .sidebar li {
+        position: relative;
+        margin: 8px 0;
+        list-style: none;
+    }
+
+    .sidebar input {
+        font-size: 15px;
+        color: #fff;
+        font-weight: 400;
+        outline: none;
+        height: 50px;
+        width: 100%;
+        border: none;
+        border-radius: 12px;
+        transition: all 0.5s ease;
+        background: #1d1b31;
+    }
+
+    .sidebar.open input {
+        padding: 0 20px 0 50px;
+        width: 100%;
+    }
+
+    .sidebar .bx-search {
+        position: absolute;
+        top: 50%;
+        left: 0;
+        transform: translateY(-50%);
+        font-size: 22px;
+        background: #1d1b31;
+        color: #fff;
+    }
+
+    .sidebar .bx-search:hover {
+        background: #fff;
+        color: #11101D;
+    }
+
+    .sidebar.open .bx-search:hover {
+        background: #1d1b31;
+        color: #fff;
+    }
+
+    .sidebar li i {
+        height: 50px;
+        line-height: 50px;
+        font-size: 18px;
+        border-radius: 12px;
+    }
+
+    .sidebar li a {
+        display: flex;
+        height: 100%;
+        width: 100%;
+        border-radius: 12px;
+        align-items: center;
+        text-decoration: none;
+        transition: all 0.4s ease;
+        background: #7F00FF;
+    }
+
+    .sidebar li a:hover {
+        background: #fff;
+    }
+
+    .sidebar li a .links_name {
+        color: #fff;
+        font-size: 15px;
+        font-weight: 400;
+        white-space: nowrap;
+        opacity: 0;
+        pointer-events: none;
+        transition: 0.4s;
+    }
+
+    .sidebar.open li a .links_name {
+        opacity: 1;
+        pointer-events: auto;
+    }
+
+    .sidebar li a:hover .links_name,
+    .sidebar li a:hover i {
+        transition: all 0.5s ease;
+        color: #11101D;
+    }
+
+    .sidebar li .tooltip {
+        position: absolute;
+        top: -20px;
+        left: calc(100% + 15px);
+        background: #fff;
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+        padding: 6px 12px;
+        border-radius: 4px;
+        font-size: 15px;
+        font-weight: 400;
+        opacity: 0;
+        white-space: nowrap;
+        pointer-events: none;
+        transition: 0s;
+    }
+
+    .sidebar li:hover .tooltip {
+        opacity: 1;
+        pointer-events: auto;
+        transition: all 0.4s ease;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+
+    .sidebar.open li .tooltip {
+        display: none;
+    }
+
+    .sidebar li.profile {
+        position: fixed;
+        height: 60px;
+        width: 78px;
+        left: 0;
+        bottom: -8px;
+        padding: 10px 14px;
+        background: #1d1b31;
+        transition: all 0.5s ease;
+        overflow: hidden;
+    }
+
+    .sidebar.open li.profile {
+        width: 250px;
+    }
+
+    .sidebar li .profile-details {
+        display: flex;
+        align-items: center;
+        flex-wrap: nowrap;
+    }
+
+    .sidebar li img {
+        height: 45px;
+        width: 45px;
+        object-fit: contain;
+        border-radius: 6px;
+        margin-right: 10px;
+    }
+
+    .sidebar li.profile .name,
+    .sidebar li.profile .job {
+        font-size: 15px;
+        font-weight: 400;
+        color: #fff;
+        white-space: nowrap;
+    }
+
+    .sidebar li.profile .job {
+        font-size: 12px;
+    }
+
+    .sidebar .profile #log_out {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+        background: #1d1b31;
+        width: 100%;
+        height: 60px;
+        line-height: 60px;
+        transition: all 0.5s ease;
+    }
+
+    .sidebar.open .profile #log_out {
+        width: 50px;
+        background: none;
+    }
+
+    .home-section {
+        position: relative;
+        background: #e4e9f7;
+        min-height: 100vh;
+        top: 0;
+        left: 78px;
+        width: calc(100% -78px);
+        transition: all 0.5s ease;
+    }
+
+    .sidebar.open~.home-section {
+        left: 250px;
+        width: calc(100%-250px);
+    }
+
+    .home-section .text {
+        display: inline-block;
+        color: #11101D;
+        font-size: 25px;
+        font-weight: 500;
+        margin: 18px;
+    }
+</style>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <div class="main_logo">Bionic Ape <img src="/bionicape.png" alt="Logo" class="img-fluid center"
+                    style="max-width: 30px;"></div>
+            <i class='bx bx-menu' id="btn"></i>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <i class='bx bx-search'></i>
+                <input type="text" placeholder="Create a Channel...">
+                <span class="tooltip">CreateChannel</span>
+            </li>
+            <li>
+                <a href="/channelChatting">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="links_name">Channels</span>
+                </a>
+                <span class="tooltip">Channels</span>
+            </li>
+            <li>
+                <a href="/userDM">
+                    <i class='bx bx-user'></i>
+                    <span class="links_name">Users</span>
+                </a>
+                <span class="tooltip">Users</span>
+            </li>
+            <li>
+                <a href="">
+                    <i class='bx bx-cog'></i>
+                    <span class="links_name">Settings</span>
+                </a>
+                <span class="tooltip">Settings</span>
+            </li>
+            <li class="profile">
+                <div class="profile-details">
+                    <div class="name_job"><br>
+                        <div class="name">NAME OF CURRENT USER</div>
+                    </div>
+                </div>
+                <i class='bx bx-log-out' id="log_out"></i>
+            </li>
+        </ul>
+    </div>
+
+    <section class="home-section">
+        <div class="text">User DM</div>
+        <div class="container">
+            <div class="row">
+                <!-- Channel list -->
+                <ul class="nav flex-column col-md-3" id="renderList">
+                    <!-- Channels will be added here dynamically -->
+                </ul>
+
+                <!-- Chatbox -->
+            </div>
+        </div>
+        <ul class="nav flex-column" id="listOfUsers"></ul>
+        <div>
+            <h1 id="currentChatBoxTitle"></h1>
+            <div class="history-chatbox">
+                <ul id="messages"></ul>
+            </div>
+            <form id="form" action="">
+                <input id="input" autocomplete="off" />
+                <button id="toes">Send</button>
+            </form>
+        </div>
+    </section>
+
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script>
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        let searchBtn = document.querySelector(".bx-search");
+        displayAllUser();
+
+        closeBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        searchBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        function menuBtnChange() {
+            if (sidebar.classList.contains("open")) {
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            } else {
+                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+            }
+        }
+
+        menuBtnChange();
+        var currentChannel;
+        var currentRecipientUser;
+        var mode = '';
+        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
+
+        function displayAllUser() {
+            fetch('api/user')
+                .then(res => res.json())
+                .then(users => {
+                    const renderUserList = document.getElementById('listOfUsers');
+                    renderUserList.innerHTML = '';
+
+
+                    if (users && users.length > 0) {
+                        users.forEach(user => {
+                            let li = document.createElement('li');
+                            let a = document.createElement('a');
+                            a.href = '#';
+                            a.setAttribute("onclick", "selectUser(this)");
+                            li.setAttribute("id", user.username + "_id")
+                            a.textContent = user.username;
+                            li.appendChild(a);
+                            renderUserList.appendChild(li);
+                        });
+                    } else {
+                        let li = document.createElement('li');
+                        li.textContent = 'No user found. ';
+                        renderUserList.appendChild(li);
+                    }
+
+
+                })
+        }
+
+        //call displayAllUser on loading page to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllUser);
+
+
+        const socket = io();
+
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messagesUL = document.getElementById('messages');
+
+
+
+
+        function constructChatMessageFromJson(data) {
+            if (!data.visible) {
+                return DELETED_MODERATOR_MESSAGE;
+            }
+            return data.username + ":" + data.msg;
+        }
+
+
+        function addChatMessageToChatBox(msg)//create li
+        {
+            const item = document.createElement('li');//creates the 'li' tag for each message sent
+            item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
+            messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul  
+            item.setAttribute("onclick", "deleteMessage(this)");
+            item.setAttribute("id", msg.messageId);
+            item.setAttribute("data-visibility", msg.visible);
+        }
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                if (mode == "channel") {
+                    socket.emit('channel message', input.value, currentChannel);
+                }
+                else {
+                    socket.emit('dms to user', input.value, currentRecipientUser);
+                }
+                input.value = '';
+            }
+        });
+
+        socket.on('channel message', (msg, channelName) => {
+            console.log(channelName);
+            if (channelName === currentChannel) {
+                addChatMessageToChatBox(msg);
+                window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else {
+                //notification
+                console.log("notify", channelName);
+                const channelToNotify = document.getElementById(msg.channelName + "_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+        });
+        socket.on('dms to user', (msg, currentRecipient) => {
+            console.log("I have received dm", msg, currentRecipient);
+            if (currentRecipient === currentRecipientUser) {
+                addChatMessageToChatBox(msg);
+                window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else {
+                //notification
+                console.log("notify", currentRecipient);
+                const userToNotify = document.getElementById(msg.username + "_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+        });
+        function clearBox(elementID) {
+            console.log(elementID);
+            let element = document.getElementById(elementID);
+            element.innerHTML = "";//get the tag and whatever is in between becomes empty
+
+        }
+        function loadChatHistoryOfCurrentChannel() {
+            fetch("/api/channel/" + currentChannel)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(JSON.stringify(data))
+                    //createListUserInChannel(data);
+                    clearBox("messages");
+                    data.messageIds.forEach(message => {
+                        addChatMessageToChatBox(message);
+                    })
+                })
+                .catch(console.error);
+        }
+        function loadChatHistoryOfCurrentRecipientUser() {
+            fetch("/api/user/userDMs/" + currentRecipientUser)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(JSON.stringify(data))
+                    clearBox("messages");
+                    data.userDMs.forEach(dms => {
+                        if (dms.recipientUser == currentRecipientUser) {
+                            dms.messageIds.forEach(individualMessage => {
+                                addChatMessageToChatBox(individualMessage);
+                            })
+                        }
+
+                    })
+                })
+                .catch(console.error);
+        }
+
+
+        function selectChannel(element) {
+            mode = "channel";
+            const displayChannelName = document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentChannel = element.innerHTML;
+            displayChannelName.innerHTML = element.innerHTML;
+            loadChatHistoryOfCurrentChannel();
+        }
+
+        function selectUser(element) {
+            mode = "dms";
+            const selectUsername = document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentRecipientUser = element.innerHTML;
+            selectUsername.innerHTML = element.innerHTML;
+            loadChatHistoryOfCurrentRecipientUser();
+
+
+        }
+        function deleteMessage(element) {
+            let messageId = element.getAttribute("id");
+            let visible = element.getAttribute("data-visibility");
+            let visibleInBoolType = (visible === 'true');
+            console.log(!visibleInBoolType);
+            socket.emit('modify channel message', messageId, !visibleInBoolType);
+        }
+        socket.on('modify channel message', (message, visible) => {
+            console.log(message);
+            const findMessage = document.getElementById(message.messageId);
+            const elementMessageVisibility = findMessage.getAttribute("data-visibility");
+            if (visible == elementMessageVisibility) {
+                return;
+            }
+
+            findMessage.setAttribute("data-visibility", visible);
+            if (visible) {
+                findMessage.innerHTML = constructChatMessageFromJson(message)
+
+            }
+            else {
+                findMessage.innerHTML = DELETED_MODERATOR_MESSAGE;
+            }
+
+
+
+
+        });
+    </script>
+</body>
+
+</html>

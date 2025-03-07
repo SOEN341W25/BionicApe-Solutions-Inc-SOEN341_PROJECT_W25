@@ -123,6 +123,7 @@
         border-radius: 12px;
         transition: all 0.5s ease;
         background: #1d1b31;
+        margin-top: 56px;
     }
 
     .sidebar.open input {
@@ -134,6 +135,7 @@
         position: absolute;
         top: 50%;
         left: 0;
+        margin-bottom: 30px;
         transform: translateY(-50%);
         font-size: 22px;
         background: #1d1b31;
@@ -330,6 +332,9 @@
         /* Add specific margin to the right */
     }
 
+    .admin-btn {}
+
+
     #renderList {
         text-align: left;
         /* Aligns the list to the left */
@@ -362,6 +367,7 @@
         border-radius: 8px;
         padding: 15px;
         margin-left: 20px;
+        margin-right: 100px;
         background-color: white;
     }
 
@@ -371,6 +377,7 @@
         border: 1px solid #eee;
         padding: 10px;
         margin-bottom: 10px;
+        margin-right: 100px;
     }
 
     #form {
@@ -380,6 +387,8 @@
     #input {
         flex-grow: 1;
         padding: 8px;
+
+        margin-left: 20px;
         border: 1px solid #ddd;
         border-radius: 4px 0 0 4px;
     }
@@ -391,6 +400,46 @@
         border: none;
         border-radius: 0 4px 4px 0;
         cursor: pointer;
+    }
+
+    #toes {
+        margin-left: 0px;
+        margin-right: 200px;
+    }
+
+    .admin-btn {
+        background-color: #31a9e1;
+        /* Bright blue color from the image */
+        color: white;
+        padding: 8px 16px;
+        border: none;
+        border-radius: 8px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        text-align: center;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+        transition: background-color 0.2s ease;
+    }
+
+    .admin-btn:hover {
+        background-color: #2b98cb;
+        /* Slightly darker blue for hover state */
+    }
+
+    .admin-btn:active {
+        background-color: #2587b5;
+        /* Even darker blue for active/pressed state */
+    }
+
+    .sidebar:not(.open) .admin-btn {
+        display: none;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar .admin-btn {
+        display: block;
+        transition: all 0.5s ease;
     }
 </style>
 
@@ -404,8 +453,12 @@
         <ul class="nav-list">
             <li>
                 <i class='bx bx-search'></i>
-                <input type="text" placeholder="Create a Channel...">
-                <span class="tooltip">CreateChannel</span>
+                <form class="form">
+                    <input type="text" class="admin-input" type="text" name="channelName" id="channelName"
+                        placeholder="Create a Channel...">
+                    <span class="tooltip">CreateChannel</span><br><br>
+                    <button class="admin-btn" type="submit">Create</button>
+                </form>
             </li>
             <li>
                 <a href="/channelChatting">
@@ -440,136 +493,33 @@
     </div>
     <section class="home-section">
         <div class="text">Channel Chatting</div>
-        <!-- Separate the channel list from the chat area -->
         <div class="container">
             <div class="row">
-                <div class="col-md-3">
-                    <!-- This is your channel list -->
-                    <ul class="nav flex-column" id="renderList">
-                        <!-- Channels will be added here dynamically -->
-                    </ul>
-                </div>
-                <div class="col-md-9">
-                    <!-- This is your chat area -->
-                    <div id="chatArea">
-                        <h1 id="currentChatBoxTitle"></h1>
-                        <div class="history-chatbox">
-                            <ul id="messages"></ul>
-                        </div>
-                        <form id="form" action="">
-                            <input id="input" autocomplete="off" /><button>Send</button>
-                        </form>
-                    </div>
-                </div>
+                <!-- Channel list -->
+                <ul class="nav flex-column col-md-3" id="renderList">
+                    <!-- Channels will be added here dynamically -->
+                </ul>
+
+                <!-- Chatbox -->
             </div>
+        </div>
+        <div>
+            <h1 id="currentChatBoxTitle"></h1>
+            <div class="history-chatbox">
+                <ul id="messages"></ul>
+            </div>
+            <form id="form" action="">
+                <input id="input" autocomplete="off" />
+                <button id="toes">Send</button>
+            </form>
         </div>
     </section>
 
+
+
+
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <script>
-        let sidebar = document.querySelector(".sidebar");
-        let closeBtn = document.querySelector("#btn");
-        let searchBtn = document.querySelector(".bx-search");
-
-        closeBtn.addEventListener("click", () => {
-            sidebar.classList.toggle("open");
-            menuBtnChange();
-        })
-
-        searchBtn.addEventListener("click", () => {
-            sidebar.classList.toggle("open");
-            menuBtnChange();
-        })
-
-        function menuBtnChange() {
-            if (sidebar.classList.contains("open")) {
-                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
-            } else {
-                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-            }
-        }
-
-        menuBtnChange();
-        displayAllChannel();
-
-        var currentChannel;
-        var currentRecipientUser;
-        var mode = '';
-        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.querySelector('.toggle-btn');
-
-
-            sidebar.classList.toggle('collapsed');
-
-
-            if (sidebar.classList.contains('collapsed')) {
-                toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
-            } else {
-                toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
-            }
-        }
-
-
-
-
-        const formEl = document.querySelector('.form');
-
-
-        formEl.addEventListener('submit', event => {
-            event.preventDefault();
-            const formData = new FormData(formEl);
-            const data = Object.fromEntries(formData);
-
-
-            fetch('/api/channel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(res => res.json())
-                .then(data => {
-                    displayAllChannel(); // Refresh the list of channels
-                })
-                .catch(err => console.log(err));
-        });
-
-
-        function displayAllChannel() {
-            fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
-                .then(res => res.json())
-                .then(channels => {
-                    const renderList = document.getElementById('renderList');
-                    renderList.innerHTML = ''; // Clear the current list
-
-
-                    if (channels && channels.length > 0) {
-                        channels.forEach(channel => {
-                            const li = document.createElement('li');
-                            const a = document.createElement('a');
-                            a.href = '#';
-                            a.setAttribute("onclick", "selectChannel(this)");
-                            li.setAttribute("id", channel.channelName + "_id")
-                            a.textContent = channel.channelName;
-                            li.appendChild(a);
-                            renderList.appendChild(li);
-                        });
-                    } else {
-                        const li = document.createElement('li');
-                        li.textContent = 'No channels found.';
-                        renderList.appendChild(li);
-                    }
-                })
-                .catch(err => console.log(err));
-        }
-
-        // Call displayAllChannel on loading page to initially populate the list
-        document.addEventListener('DOMContentLoaded', displayAllChannel);
-
         const socket = io();
 
         const form = document.getElementById('form');
@@ -722,6 +672,110 @@
 
 
         });
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        let searchBtn = document.querySelector(".bx-search");
+
+        closeBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        searchBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        function menuBtnChange() {
+            if (sidebar.classList.contains("open")) {
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            } else {
+                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+            }
+        }
+
+        menuBtnChange();
+        displayAllChannel();
+
+        var currentChannel;
+        var currentRecipientUser;
+        var mode = '';
+        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+
+            sidebar.classList.toggle('collapsed');
+
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
+            } else {
+                toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
+            }
+        }
+
+
+
+
+        const formEl = document.querySelector('.form');
+
+
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+
+
+            fetch('/api/channel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    displayAllChannel(); // Refresh the list of channels
+                })
+                .catch(err => console.log(err));
+        });
+
+
+        function displayAllChannel() {
+            fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
+                .then(res => res.json())
+                .then(channels => {
+                    const renderList = document.getElementById('renderList');
+                    renderList.innerHTML = ''; // Clear the current list
+
+
+                    if (channels && channels.length > 0) {
+                        channels.forEach(channel => {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = '#';
+                            a.setAttribute("onclick", "selectChannel(this)");
+                            li.setAttribute("id", channel.channelName + "_id")
+                            a.textContent = channel.channelName;
+                            li.appendChild(a);
+                            renderList.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.textContent = 'No channels found.';
+                        renderList.appendChild(li);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+
+        // Call displayAllChannel on loading page to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllChannel);
+
+
     </script>
 </body>
 
