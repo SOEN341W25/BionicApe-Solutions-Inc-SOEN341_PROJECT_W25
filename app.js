@@ -320,6 +320,14 @@ app.get("/login", function (req, res) {
   res.render("login");
 });
 
+app.get('/channelChatting', function(req, res) {
+  res.render('channelChatting'); // Make sure this file exists in the "views" folder
+});
+
+app.get('/userDM',function (req, res){
+  res.render('userDM'); // Make sure this file exists in the "views" folder
+});
+
 //Showing channel form
 app.get("/channels", async (req, res) => {
   try {
@@ -406,6 +414,10 @@ app.post("/login", async (req, res) =>{
       res.status(400).json({ error });
     }
 });
+
+
+
+
 
 
 //Function used to check if session is still valid (if the user is logged in)
