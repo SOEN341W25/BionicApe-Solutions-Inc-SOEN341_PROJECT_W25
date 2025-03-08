@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sidebar</title>
-    <link rel="stylesheet" href="styles.css">
+    <!-- <link rel="stylesheet" href="style.css"> -->
     <script src="script.js" defer></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -302,6 +302,92 @@
         font-weight: 500;
         margin: 18px;
     }
+
+    
+    #form {
+        display: flex;
+    }
+
+    #input {
+        flex-grow: 1;
+        padding: 8px;
+
+        margin-left: 20px;
+        border: 1px solid #ddd;
+        border-radius: 4px 0 0 4px;
+    }
+
+    #form button {
+        padding: 8px 16px;
+        background-color: #5D3FD3;
+        color: white;
+        border: none;
+        border-radius: 0 4px 4px 0;
+        cursor: pointer;
+    }
+
+    #toes {
+        margin-left: 0px;
+        margin-right: 200px;
+    }
+
+    #renderList {
+        list-style: none;
+        padding: 0;
+    }
+
+    #renderList li {
+        background-color: #28adeb;
+        /* Baby blue color */
+        color: white;
+        padding: 10px 15px;
+        margin: 8px 0;
+        border-radius: 6px;
+        text-align: center;
+        cursor: pointer;
+        transition: background-color 0.3s, transform 0.2s;
+        font-size: 16px;
+        font-weight: bold;
+        display: inline-block;
+        /* Makes the li only as wide as its content */
+        max-width: 250px;
+        /* Sets a maximum width */
+        text-decoration: none;
+        /* Removes underlines */
+        margin-right: 15px;
+        /* Add specific margin to the right */
+    }
+
+    .admin-btn {}
+
+
+    #renderList {
+        text-align: left;
+        /* Aligns the list to the left */
+        padding-left: 20px;
+        /* Adds some padding from the left edge */
+        list-style-type: none;
+        /* Removes bullet points if present */
+    }
+
+    #renderList li:hover {
+        background-color: #75B7E1;
+        /* Slightly darker baby blue for hover */
+        transform: scale(1.05);
+    }
+
+    #renderList li:active {
+        background-color: #5A9BC7;
+        /* Even darker for active state */
+        transform: scale(0.98);
+    }
+
+    /* In case there are any links inside the list items */
+    #renderList li a {
+        text-decoration: none;
+        color: inherit;
+    }
+
 </style>
 
 <body>
@@ -353,15 +439,14 @@
         <div class="text">User DM</div>
         <div class="container">
             <div class="row">
-                <!-- Channel list -->
+                <!-- User list -->
                 <ul class="nav flex-column col-md-3" id="renderList">
-                    <!-- Channels will be added here dynamically -->
+                    <!-- Users will be added here dynamically -->
                 </ul>
-
                 <!-- Chatbox -->
             </div>
         </div>
-        <ul class="nav flex-column" id="listOfUsers"></ul>
+
         <div>
             <h1 id="currentChatBoxTitle"></h1>
             <div class="history-chatbox">
@@ -410,7 +495,7 @@
             fetch('api/user')
                 .then(res => res.json())
                 .then(users => {
-                    const renderUserList = document.getElementById('listOfUsers');
+                    const renderUserList = document.getElementById('renderList');
                     renderUserList.innerHTML = '';
 
 

@@ -11,13 +11,13 @@ const { join }=require('node:path');
 const { Server }= require('socket.io');
 
 
-require('./database/db');   
-const User = require("./model/User");
-const Channel = require("./model/Channel");
-const Message = require("./model/Message");
-const Counters = require("./model/Counters");
+require('./BACKEND_/database/db');   
+const User = require("./BACKEND_/model/User");
+const Channel = require("./BACKEND_/model/Channel");
+const Message = require("./BACKEND_/model/Message");
+const Counters = require("./BACKEND_/model/Counters");
 const mongoose = require('mongoose')
-const { sessionMiddleware, wrap }=require("./session/serverController");
+const { sessionMiddleware, wrap }=require("./BACKEND_/session/serverController");
 //const bcrypt = require("bcrypt");
 //============================
 //SETUP EXPRESS
@@ -29,10 +29,10 @@ const io= new Server(server);
 
 
 //Set up static file serving
-app.use(express.static(path.join(__dirname,'public')));
+app.use(express.static(path.join(__dirname,'FRONTEND_/public')));
 
 app.set("view engine", "ejs");//setup view engine ejs
-app.set('views', path.join(__dirname, 'views'));
+app.set('views', path.join(__dirname, 'FRONTEND_/views'));
 var bodyParser=require('body-parser');//support data payload for post requests
 const { channel } = require("diagnostics_channel");
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
