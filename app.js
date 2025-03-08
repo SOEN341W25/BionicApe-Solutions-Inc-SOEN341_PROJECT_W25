@@ -29,7 +29,7 @@ const io= new Server(server);
 
 
 //Set up static file serving
-app.use(express.static(path.join(__dirname,'FRONTEND_/public')));
+app.use(express.static(path.join(__dirname,'public')));
 
 app.set("view engine", "ejs");//setup view engine ejs
 app.set('views', path.join(__dirname, 'FRONTEND_/views'));
