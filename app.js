@@ -35,6 +35,7 @@ app.set("view engine", "ejs");//setup view engine ejs
 app.set('views', path.join(__dirname, 'FRONTEND_/views'));
 var bodyParser=require('body-parser');//support data payload for post requests
 const { channel } = require("diagnostics_channel");
+const { truncate, truncateSync } = require("node:fs");
 app.use( bodyParser.json() );       // to support JSON-encoded bodies
 app.use(bodyParser.urlencoded({ extended: true }));
 
@@ -485,7 +486,7 @@ async function isAdmin(req,res,next){
 // WEBSOCKET FUNCTION
 //=====================
 let usersocketmap = {};
-io.on('connection', (socket)=>{
+io.on('connection',  async function(socket){
   console.log("connected!")
   let userName=socket.request.session.user;
   usersocketmap[userName] = socket.id;//put the username in the [] and it will return a socket id value
@@ -494,7 +495,12 @@ io.on('connection', (socket)=>{
 //if admin logs in, it will have a socket id as the value, the key is admin
 //key=admin or user, value=socketid, a map is a list of key value
   console.log(usersocketmap[userName]);
-
+  let activeStatus="online";
+  let currentTime=new Date();
+  let user=await User.findOneAndUpdate({username:userName},{userStatus:activeStatus, lastActivateAt:currentTime},{new:true});
+  console.log(user, "this is connect mode");
+  io.emit('user status', user);
+  
 
   socket.on('channel message', async (msg, channelName)=>{
     let userName=socket.request.session.user;
@@ -502,6 +508,7 @@ io.on('connection', (socket)=>{
       io.emit('channel message',newMessage, channelName);//backend will rebroadcast it to everyone 
       console.log("sending msg! ",JSON.stringify(newMessage))
   });
+ 
 
   socket.on('dms to user', async (msg, currentRecipientUser)=>{
     let userName=socket.request.session.user;
@@ -545,6 +552,16 @@ io.on('connection', (socket)=>{
     let messageToDelete=await deleteMessageInDatabase(messageId, visibility);
       io.emit('modify channel message', messageToDelete, visibility);
       console.log("deleting msg! ", JSON.stringify(messageToDelete))
+  })
+  socket.on('disconnect', async ()=>{//sprint 3 feature
+    console.log('got disconnect');
+    let userName=socket.request.session.user;
+   // delete usersocketmap[userName];
+    let activeStatus="offline";
+    let currentTime=new Date();//the now time/current time the user log off
+    let user=await User.findOneAndUpdate({username:userName},{userStatus:activeStatus, lastActivateAt:currentTime},{new:true});
+    console.log(user, "this is the disconnect mode");
+    io.emit('user status', user);
   })
 });
 

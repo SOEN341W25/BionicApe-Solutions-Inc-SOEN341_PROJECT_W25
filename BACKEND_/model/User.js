@@ -24,8 +24,14 @@ var User = new Schema({
     		type: mongoose.Schema.Types.ObjectId,
     		ref: 'Message' //Reference to the Message model
     		}]
-    	}]
-})
+    	}],
+    userStatus:{
+        type: String
+    },
+    lastActivateAt: {
+        type: Date  
+    }
+ })
 
 //remove password when transforming to JSON. Don't want to send back to clients with password
 User.method.toJSON= function(){
@@ -37,3 +43,4 @@ User.method.toJSON= function(){
 
 //this is mongodb collection
 module.exports = mongoose.model('users', User)
+    
