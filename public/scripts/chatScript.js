@@ -65,6 +65,7 @@ socket.on('dms to user', (msg, currentRecipient) => {
         //channelToNotify.style.backgroundColor = "red"
     }
 });
+
 function clearBox(elementID) {
     console.log(elementID);
     let element = document.getElementById(elementID);

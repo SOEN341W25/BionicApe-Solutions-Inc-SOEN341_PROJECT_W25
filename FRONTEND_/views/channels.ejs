@@ -7,6 +7,7 @@
     <title>Sidebar</title>
     <link rel="icon" href="/images/favicon.ico"/>
     <!-- <link rel="stylesheet" href="style.css"> -->
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
 <style>
@@ -376,6 +377,12 @@
         }
 
         menuBtnChange();
+        const socket = io();
+        socket.on('user status',  (currentRecipient)=>{
+            console.log("the recipient's status has changed", currentRecipient);
+        
+        }); 
+         
     </script>
 </body>
 
