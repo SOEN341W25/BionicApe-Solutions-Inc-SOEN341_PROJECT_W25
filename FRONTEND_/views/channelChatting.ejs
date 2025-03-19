@@ -79,9 +79,18 @@
             <div class="history-chatbox">
                 <ul id="messages"></ul>
             </div>
+            <form  id="inviteForm" action="" style="display: none;">
+                <input id="inputInvite" autocomplete="off" />
+                <button id="invite">INVITE</button>
+            </form> 
+            <!-- Frontend will shine and fix this invite placement-->
             <form id="form" action="">
                 <input id="input" autocomplete="off" />
                 <button id="toes">Send</button>
+            </form>
+            <form id="leaveChannelForm" action=""style="display: none;">
+                <button id="leaveChannel">Remove</button>
+
             </form>
         </div>
     </section>
@@ -93,7 +102,9 @@
         const form = document.getElementById('form');
         const input = document.getElementById('input');
         const messagesUL = document.getElementById('messages');
-
+        const inviteForm=document.getElementById('inviteForm');
+        const inputInvite=document.getElementById('inputInvite');
+        const leaveChannelForm=document.getElementById('leaveChannelForm');
 
 
 
@@ -126,7 +137,21 @@
                 input.value = '';
             }
         });
-
+        inviteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (inputInvite.value) {
+                if (mode == "channel") {
+                    socket.emit('channel invite', inputInvite.value, currentChannel);
+                }
+                inputInvite.value = '';
+            }
+        });
+        leaveChannelForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (mode == "channel") {
+                socket.emit('channel leave', currentChannel);
+            }
+        });
         socket.on('channel message', (msg, channelName) => {
             console.log(channelName);
             if (channelName === currentChannel) {
@@ -141,6 +166,29 @@
                 //channelToNotify.style.backgroundColor = "red"
             }
         });
+        socket.on('channel invite', (channel, userExist)=>{
+            if(!userExist)
+            {
+                alert("User does not exist");
+            }
+            else
+            {
+                alert(JSON.stringify(channel));
+
+            }
+        })
+        socket.on('channel leave', (userLeft)=>{
+            if(userLeft)
+            {
+                alert("User left");
+                location.reload();//refresh the page to make leaving channel dissapear
+            }
+            else
+            {
+                alert("User fail to leave");
+            }
+
+        })
         socket.on('dms to user', (msg, currentRecipient) => {
             console.log("I have received dm", msg, currentRecipient);
             if (currentRecipient === currentRecipientUser) {
@@ -171,6 +219,17 @@
                     data.messageIds.forEach(message => {
                         addChatMessageToChatBox(message);
                     })
+                   if(data.public == undefined || data.public==true){
+                    inviteForm.style.display='none';
+                    leaveChannelForm.style.display='none';
+                    
+                   }
+                   else{
+                    inviteForm.style.display='inline-block';
+                    leaveChannelForm.style.display='inline-block';
+                   }
+                   //mongodb is not very restrictive so the schema can differ.
+                   //no sql is flexible in terms of schema therefore, we need to mention both statement wheter the data is undefined and true
                 })
                 .catch(console.error);
         }
@@ -266,6 +325,7 @@
         displayAllChannel();
 
         var currentChannel;
+
         var currentRecipientUser;
         var mode = '';
         const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";

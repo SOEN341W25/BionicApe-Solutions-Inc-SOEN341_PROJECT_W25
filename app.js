@@ -140,7 +140,8 @@ if(!channel)
 {
   const newChannel = await Channel.create({
     channelName: req.body.channelName,
-    users: [req.session.user]
+    users: [req.session.user],
+    public: req.body.public=="true"//conversion from string too boolean cause frontend can only have strings as values
   });
   return res.status(200).json(newChannel);
 }
@@ -169,11 +170,11 @@ app.delete("/api/channel/:channelName", async function (req, res){
 app.get("/api/user/channels", isLoggedIn, async function (req, res) {
   const user = req.session.user;
   let adminRole = await isAdminCheck(req.session.user);
-  let queryJson = adminRole? {} : {users: user};
+  let queryJson = adminRole? {} : {$or:[{users: user}, {public:true}]};
   const channels = await Channel.find(queryJson);
   return res.status(200).json(channels)
 });
-
+//querying=searching
 //CHAT FEATURE
 
 // get history of channel when select channel
@@ -553,13 +554,32 @@ io.on('connection',  async function(socket){
       io.emit('modify channel message', messageToDelete, visibility);
       console.log("deleting msg! ", JSON.stringify(messageToDelete))
   })
+  socket.on('channel invite', async(userToInvite, inviteToChannel)=>{
+    console.log('user got invited');
+    let userName= await User.findOne({username:userToInvite});
+    let userSession=socket.request.session.user;
+    if(userName)
+    {
+      let channel=await Channel.findOneAndUpdate({channelName:inviteToChannel, users:userSession}, {$push: {users:userToInvite}},{new:true});//new:true, means it gives the updated object
+      socket.emit('channel invite', channel, true);//if user exist, we can invite them to the channel
+    }
+    else{
+      socket.emit('channel invite', null, false);//null because we didn't get to send the channel
+    }
+  })
+  socket.on('channel leave', async(leaveCurrentChannel)=>{//leaving channel
+    console.log('user has left');
+    let userSession=socket.request.session.user;
+    let channel=await Channel.findOneAndUpdate({channelName:leaveCurrentChannel, users:userSession}, {$pull: {users:userSession}},{new:true});
+    socket.emit('channel leave', true);//userSession: leaving the user himself from channel
+  })
   socket.on('disconnect', async ()=>{//sprint 3 feature
     console.log('got disconnect');
     let userName=socket.request.session.user;
    // delete usersocketmap[userName];
     let activeStatus="offline";
     let currentTime=new Date();//the now time/current time the user log off
-    let user=await User.findOneAndUpdate({username:userName},{userStatus:activeStatus, lastActivateAt:currentTime},{new:true});
+    let user=await User.findOneAndUpdate({username:userName},{userStatus:activeStatus, lastActivateAt:currentTime},{new:true});//new: true, means it gives the updated object
     console.log(user, "this is the disconnect mode");
     io.emit('user status', user);
   })

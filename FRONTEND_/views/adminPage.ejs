@@ -10,13 +10,15 @@
 </head>
 
 
-
+<!-- frontend, it is time to shine and fix the checkbox for public channel :)-->
 <body>
 	<div class="admin-container">
 	<div class="admin-left-column">
 	<h1 class="admin-title">Admin Hub</h1>
 	<form class ="form">
-			<input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
+		<input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
+        <input type="checkbox" id="publicChannel" name="public" value="true"/>
+        <label for="publicChannel">public channel</label> <br>
 		<button class="admin-btn" type="submit">Create</button>
 	</form>
     

@@ -3,7 +3,7 @@
 const mongoose = require('mongoose')
 const Schema = mongoose.Schema
 
-var Channel = new Schema({
+var Channel = new Schema({//fieldtype: variable type
     channelName: {
         type: String
     },
@@ -12,6 +12,9 @@ var Channel = new Schema({
     ],
     users: {
         type:[String]
+    },
+    public: {
+        type: Boolean, default:true
     }
 })
 
