@@ -7,10 +7,10 @@ ChatHaven solves these challenges by offering a user-friendly platform that supp
 
 ## Team Members and Roles 
 * Yahia ElSharkawi : Backend Developer
-* Talal Hammami : FrontEnd Developer
-* Mari Kajita : Backend Developer 
+* Talal Hammami : FrontEnd Developer, Scrum Master Sprint #3
+* Mari Kajita : Backend Developer, Secretary Spring #3
 * Suriya Paramathypathy : FrontEnd Developer
-* Levon Tavitian : Backend Developer, Sprint #1 Scrum Master
+* Levon Tavitian : Backend Developer, Product Owner #3
 * Mathis Vuong : Backend Developer
 
 
