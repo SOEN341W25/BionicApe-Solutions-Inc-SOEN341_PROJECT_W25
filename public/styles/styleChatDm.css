@@ -1,429 +1,455 @@
-
 * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-    font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  font-family: "Poppins", sans-serif;
 }
 
 .sidebar {
-    position: fixed;
-    left: 0;
-    top: 0;
-    height: 100%;
-    width: 78px;
-    background: #5D3FD3;
-    padding: 6px 14px;
-    z-index: 1;
-    transition: all 0.5s ease;
+  position: fixed;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 78px;
+  background: #5d3fd3;
+  padding: 6px 14px;
+  z-index: 1;
+  transition: all 0.5s ease;
 }
 
 .sidebar.open {
-    width: 250px;
+  width: 250px;
 }
 
 .sidebar .logo-details {
-    height: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    position: relative;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
 }
 
 .sidebar .logo-details .logo_name {
-    color: #fff;
-    font-size: 20px;
-    font-weight: 600;
-    opacity: 0;
-    transition: all 0.5s ease;
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  opacity: 0;
+  transition: all 0.5s ease;
 }
 
-
 .sidebar .logo-details .main_logo {
-    color: #fff;
-    font-size: 20px;
-    font-weight: 600;
-    opacity: 0;
-    transition: opacity 0.5s ease 0.3s;
-    /* Delay only for opening */
+  color: #fff;
+  font-size: 20px;
+  font-weight: 600;
+  opacity: 0;
+  transition: opacity 0.5s ease 0.3s;
+  /* Delay only for opening */
 }
 
 .sidebar.open .logo-details .main_logo {
-    opacity: 1;
+  opacity: 1;
 }
 
 .sidebar:not(.open) .logo-details .main_logo {
-    transition: opacity 0.2s ease 0s;
-    /* No delay when closing, and faster transition */
-    opacity: 0;
+  transition: opacity 0.2s ease 0s;
+  /* No delay when closing, and faster transition */
+  opacity: 0;
 }
-
-
-
 
 .sidebar.open .logo-details,
 .sidebar.open .logo-details .logo_name {
-    opacity: 1;
+  opacity: 1;
 }
 
 .sidebar .logo-details #btn {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    font-size: 22px;
-    text-align: center;
-    cursor: pointer;
-    transition: all 0.5s ease;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  font-size: 22px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.5s ease;
 }
 
 .sidebar.open .logo-details #btn {
-    text-align: center;
+  text-align: center;
 }
 
 .sidebar i {
-    color: #fff;
-    height: 60px;
-    min-width: 50px;
-    font-size: 28px;
-    text-align: center;
-    line-height: 60px;
+  color: #fff;
+  height: 60px;
+  min-width: 50px;
+  font-size: 28px;
+  text-align: center;
+  line-height: 60px;
 }
 
 .sidebar .nav-list {
-    margin-top: 20px;
-    height: 100%;
+  margin-top: 20px;
+  height: 100%;
 }
 
 .sidebar li {
-    position: relative;
-    margin: 8px 0;
-    list-style: none;
+  position: relative;
+  margin: 8px 0;
+  list-style: none;
 }
 
 .sidebar input {
-    font-size: 15px;
-    color: #fff;
-    font-weight: 400;
-    outline: none;
-    height: 50px;
-    width: 100%;
-    border: none;
-    border-radius: 12px;
-    transition: all 0.5s ease;
-    background: #1d1b31;
-    /* margin-top: 56px; */
+  font-size: 15px;
+  color: #fff;
+  font-weight: 400;
+  outline: none;
+  height: 50px;
+  width: 100%;
+  border: none;
+  border-radius: 12px;
+  transition: all 0.5s ease;
+  background: #1d1b31;
+  /* margin-top: 56px; */
 }
 
 .sidebar.open input {
-    padding: 0 20px 0 50px;
-    width: 100%;
+  padding: 0 20px 0 50px;
+  width: 100%;
 }
 
 .sidebar .bx-search {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    margin-bottom: 30px;
-    transform: translateY(-50%);
-    font-size: 22px;
-    background: #1d1b31;
-    color: #fff;
+  position: absolute;
+  top: 50%;
+  left: 0;
+  margin-bottom: 30px;
+  transform: translateY(-50%);
+  font-size: 22px;
+  background: #1d1b31;
+  color: #fff;
 }
 
 .sidebar .bx-search:hover {
-    background: #fff;
-    color: #11101D;
+  background: #fff;
+  color: #11101d;
 }
 
 .sidebar.open .bx-search:hover {
-    background: #1d1b31;
-    color: #fff;
+  background: #1d1b31;
+  color: #fff;
 }
 
 .sidebar li i {
-    height: 50px;
-    line-height: 50px;
-    font-size: 18px;
-    border-radius: 12px;
+  height: 50px;
+  line-height: 50px;
+  font-size: 18px;
+  border-radius: 12px;
 }
 
 .sidebar li a {
-    display: flex;
-    height: 100%;
-    width: 100%;
-    border-radius: 12px;
-    align-items: center;
-    text-decoration: none;
-    transition: all 0.4s ease;
-    background: #7F00FF;
+  display: flex;
+  height: 100%;
+  width: 100%;
+  border-radius: 12px;
+  align-items: center;
+  text-decoration: none;
+  transition: all 0.4s ease;
+  background: #7f00ff;
 }
 
 .sidebar li a:hover {
-    background: #fff;
+  background: #fff;
 }
 
 .sidebar li a .links_name {
-    color: #fff;
-    font-size: 15px;
-    font-weight: 400;
-    white-space: nowrap;
-    opacity: 0;
-    pointer-events: none;
-    transition: 0.4s;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 400;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transition: 0.4s;
 }
 
 .sidebar.open li a .links_name {
-    opacity: 1;
-    pointer-events: auto;
+  opacity: 1;
+  pointer-events: auto;
 }
 
 .sidebar li a:hover .links_name,
 .sidebar li a:hover i {
-    transition: all 0.5s ease;
-    color: #11101D;
+  transition: all 0.5s ease;
+  color: #11101d;
 }
 
 .sidebar li .tooltip {
-    position: absolute;
-    top: -20px;
-    left: calc(100% + 15px);
-    background: #fff;
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
-    padding: 6px 12px;
-    border-radius: 4px;
-    font-size: 15px;
-    font-weight: 400;
-    opacity: 0;
-    white-space: nowrap;
-    pointer-events: none;
-    transition: 0s;
+  position: absolute;
+  top: -20px;
+  left: calc(100% + 15px);
+  background: #fff;
+  box-shadow: 0 5px 10px rgba(0, 0, 0, 0.3);
+  padding: 6px 12px;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 400;
+  opacity: 0;
+  white-space: nowrap;
+  pointer-events: none;
+  transition: 0s;
 }
 
 .sidebar li:hover .tooltip {
-    opacity: 1;
-    pointer-events: auto;
-    transition: all 0.4s ease;
-    top: 50%;
-    transform: translateY(-50%);
+  opacity: 1;
+  pointer-events: auto;
+  transition: all 0.4s ease;
+  top: 50%;
+  transform: translateY(-50%);
 }
 
 .sidebar.open li .tooltip {
-    display: none;
+  display: none;
 }
 
 .sidebar li.profile {
-    position: fixed;
-    height: 60px;
-    width: 78px;
-    left: 0;
-    bottom: -8px;
-    padding: 10px 14px;
-    background: #1d1b31;
-    transition: all 0.5s ease;
-    overflow: hidden;
+  position: fixed;
+  height: 60px;
+  width: 78px;
+  left: 0;
+  bottom: -8px;
+  padding: 10px 14px;
+  background: #1d1b31;
+  transition: all 0.5s ease;
+  overflow: hidden;
 }
 
 .sidebar.open li.profile {
-    width: 250px;
+  width: 250px;
 }
 
 .sidebar li .profile-details {
-    display: flex;
-    align-items: center;
-    flex-wrap: nowrap;
+  display: flex;
+  align-items: center;
+  flex-wrap: nowrap;
 }
 
 .sidebar li img {
-    height: 45px;
-    width: 45px;
-    object-fit: contain;
-    border-radius: 6px;
-    margin-right: 10px;
+  height: 45px;
+  width: 45px;
+  object-fit: contain;
+  border-radius: 6px;
+  margin-right: 10px;
 }
 
 .sidebar li.profile .name,
 .sidebar li.profile .job {
-    font-size: 15px;
-    font-weight: 400;
-    color: #fff;
-    white-space: nowrap;
+  font-size: 15px;
+  font-weight: 400;
+  color: #fff;
+  white-space: nowrap;
 }
 
 .sidebar li.profile .job {
-    font-size: 12px;
+  font-size: 12px;
 }
 
 .sidebar .profile #log_out {
-    position: absolute;
-    top: 50%;
-    right: 0;
-    transform: translateY(-50%);
-    background: #1d1b31;
-    width: 100%;
-    height: 60px;
-    line-height: 60px;
-    transition: all 0.5s ease;
+  position: absolute;
+  top: 50%;
+  right: 0;
+  transform: translateY(-50%);
+  background: #1d1b31;
+  width: 100%;
+  height: 60px;
+  line-height: 60px;
+  transition: all 0.5s ease;
 }
 
 .sidebar.open .profile #log_out {
-    width: 50px;
-    background: none;
+  width: 50px;
+  background: none;
 }
 
 .home-section {
-    position: relative;
-    background: #e4e9f7;
-    min-height: 100vh;
-    top: 0;
-    left: 78px;
-    width: calc(100% -78px);
-    transition: all 0.5s ease;
+  position: relative;
+  background: #e4e9f7;
+  min-height: 100vh;
+  top: 0;
+  left: 78px;
+  width: calc(100% -78px);
+  transition: all 0.5s ease;
 }
 
-.sidebar.open~.home-section {
-    left: 250px;
-    width: calc(100%-250px);
+.sidebar.open ~ .home-section {
+  left: 250px;
+  width: calc(100%-250px);
 }
 
 .home-section .text {
-    display: inline-block;
-    color: #11101D;
-    font-size: 25px;
-    font-weight: 500;
-    margin: 18px;
+  display: inline-block;
+  color: #11101d;
+  font-size: 25px;
+  font-weight: 500;
+  margin: 18px;
 }
 
+/* Container for direct messages */
+.containerDM {
+  margin-top: 15px;
+  height:300px;
+  overflow-y: auto;
+  border-radius: 10px;
+  scrollbar-width: thin;
+  width: 400px; 
+}
+
+/* Custom scrollbar styling */
+.containerDM::-webkit-scrollbar {
+  width: 8px;
+}
+
+.containerDM::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.containerDM::-webkit-scrollbar-thumb {
+  background: #c4c9d4;
+  border-radius: 10px;
+}
+
+.containerDM::-webkit-scrollbar-thumb:hover {
+  background: #a0a6b1;
+}
+
+/* Channel list styling */
 #renderList {
-    list-style: none;
-    padding: 0;
+  list-style: none;
+  padding: 10px;
+  margin: 0;
+  width: 100%;
 }
 
+/* Individual channel item */
 #renderList li {
-    background-color: #28adeb;
-    /* Baby blue color */
-    color: white;
-    padding: 10px 15px;
-    margin: 8px 0;
-    border-radius: 6px;
-    text-align: center;
-    cursor: pointer;
-    transition: background-color 0.3s, transform 0.2s;
-    font-size: 16px;
-    font-weight: bold;
-    display: inline-block;
-    /* Makes the li only as wide as its content */
-    max-width: 250px;
-    /* Sets a maximum width */
-    text-decoration: none;
-    /* Removes underlines */
-    margin-right: 15px;
-    /* Add specific margin to the right */
-}
-
-#renderList {
-    text-align: left;
-    /* Aligns the list to the left */
-    padding-left: 20px;
-    /* Adds some padding from the left edge */
-    list-style-type: none;
-    /* Removes bullet points if present */
+  padding: 16px 20px;
+  margin-bottom: 12px;
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  transition: transform 0.2s, box-shadow 0.2s;
+  display: flex;
+  align-items: center;
 }
 
 #renderList li:hover {
-    background-color: #75B7E1;
-    /* Slightly darker baby blue for hover */
-    transform: scale(1.05);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
 }
 
-#renderList li:active {
-    background-color: #5A9BC7;
-    /* Even darker for active state */
-    transform: scale(0.98);
-}
-
-/* In case there are any links inside the list items */
+/* Channel name styling */
 #renderList li a {
-    text-decoration: none;
-    color: inherit;
+  text-decoration: none;
+  font-size: 18px;
+  font-weight: 600;
+  color: #2c3e50;
+  margin-left: 15px;
+  flex: 1;
+  font-family: "Segoe UI", "San Francisco", Roboto, -apple-system,
+    BlinkMacSystemFont, sans-serif;
 }
 
 #chatArea {
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    padding: 15px;
-    margin-left: 20px;
-    margin-right: 100px;
-    background-color: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 15px;
+  margin-left: 20px;
+  margin-right: 100px;
+  background-color: white;
 }
 
+.containingALL{
+    display: flex; 
+    flex-direction: row;
+}
 .history-chatbox {
-    height: 300px;
-    overflow-y: auto;
-    border: 1px solid #eee;
-    padding: 10px;
-    margin-bottom: 10px;
-    margin-right: 100px;
+  background-color: red;
+  height: 300px;
+  flex: 1;
+  margin-right: 200px;
 }
 
 #form {
-    display: flex;
+  display: flex;
 }
 
 #input {
-    flex-grow: 1;
-    padding: 8px;
+  flex-grow: 1;
+  padding: 8px;
 
-    margin-left: 20px;
-    border: 1px solid #ddd;
-    border-radius: 4px 0 0 4px;
+  margin-left: 400px;
+  border: 1px solid #ddd;
+  border-radius: 4px 0 0 4px;
 }
 
 #form button {
-    padding: 8px 16px;
-    background-color: #5D3FD3;
-    color: white;
-    border: none;
-    border-radius: 0 4px 4px 0;
-    cursor: pointer;
+  padding: 8px 16px;
+  background-color: #5d3fd3;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
 }
 
 #toes {
-    margin-left: 0px;
-    margin-right: 200px;
+  margin-left: 0px;
+  margin-right: 200px;
 }
 
 .admin-btn {
-    background-color: #31a9e1;
-    /* Bright blue color from the image */
-    color: white;
-    padding: 8px 16px;
-    border: none;
-    border-radius: 8px;
-    font-size: 16px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: center;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    transition: background-color 0.2s ease;
+  background-color: #31a9e1;
+  /* Bright blue color from the image */
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  text-align: center;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.2s ease;
 }
 
+
+#messages {
+    list-style-type: none; /* Removes the bullet points */
+    padding: 0; /* Removes any default padding */
+    margin: 0; /* Removes any default margin */
+}
+
+#messages li {
+    padding: 10px; /* Adds some padding for spacing */
+    border-bottom: 1px solid #ddd; /* Adds a subtle border between items */
+    font-size: 16px; /* Adjusts the font size */
+    color: #333; /* Sets text color */
+}
+
+
+
 .admin-btn:hover {
-    background-color: #2b98cb;
-    /* Slightly darker blue for hover state */
+  background-color: #2b98cb;
+  /* Slightly darker blue for hover state */
 }
 
 .admin-btn:active {
-    background-color: #2587b5;
-    /* Even darker blue for active/pressed state */
+  background-color: #2587b5;
+  /* Even darker blue for active/pressed state */
 }
 
 .sidebar:not(.open) .admin-btn {
-    display: none;
-    transition: all 0.2s ease;
+  display: none;
+  transition: all 0.2s ease;
 }
 
 .sidebar .admin-btn {
-    display: block;
-    transition: all 0.5s ease;
+  display: block;
+  transition: all 0.5s ease;
 }

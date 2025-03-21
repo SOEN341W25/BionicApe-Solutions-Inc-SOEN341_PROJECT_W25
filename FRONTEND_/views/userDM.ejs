@@ -5,7 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sidebar</title>
-    <link rel="icon" href="/images/favicon.ico"/>
+    <link rel="icon" href="/images/favicon.ico" />
     <!-- <link rel="stylesheet" href="style.css"> -->
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
     <!-- <script src="/scripts/dmScript.js"></script> -->
@@ -60,27 +60,27 @@
     </div>
 
     <section class="home-section">
-        <div class="text">User DM</div>
-        <div class="container">
-            <div class="row">
+        <div class="text">Chat with Fellow APES</div>
+        <div class="containingALL">
+            <div class="containerDM">
                 <!-- User list -->
                 <ul class="nav flex-column col-md-3" id="renderList">
                     <!-- Users will be added here dynamically -->
                 </ul>
                 <!-- Chatbox -->
-            </div>
-        </div>
 
-        <div>
+            </div>
+
             <h1 id="currentChatBoxTitle"></h1>
             <div class="history-chatbox">
                 <ul id="messages"></ul>
             </div>
-            <form id="form" action="">
-                <input id="input" autocomplete="off" />
-                <button id="toes">Send</button>
-            </form>
+
         </div>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" />
+            <button id="toes">Send</button>
+        </form>
     </section>
 
     <script>
@@ -125,16 +125,23 @@
                         users.forEach(user => {
                             let li = document.createElement('li');
                             let a = document.createElement('a');
+
                             a.href = '#';
                             a.setAttribute("onclick", "selectUser(this)");
-                            li.setAttribute("id", user.username + "_id")
-                            a.textContent = user.username;
+                            li.setAttribute("id", user.username + "_id");
+
+                            // Check if userStatus exists, otherwise use a default value
+                            let userStatus = user.userStatus || "No Status"; // Default value if userStatus is missing
+
+                            // Add userStatus to the displayed text
+                            a.textContent = `${user.username}`; // Combine username and userStatus TI DOESNT FUCKING WORK
+
                             li.appendChild(a);
                             renderUserList.appendChild(li);
                         });
                     } else {
                         let li = document.createElement('li');
-                        li.textContent = 'No user found. ';
+                        li.textContent = 'No user found.';
                         renderUserList.appendChild(li);
                     }
 
@@ -212,7 +219,7 @@
                 //channelToNotify.setAttribute("class","sidebarNotify");
                 //channelToNotify.style.backgroundColor = "red"
             }
-        });      
+        });
         function clearBox(elementID) {
             console.log(elementID);
             let element = document.getElementById(elementID);
