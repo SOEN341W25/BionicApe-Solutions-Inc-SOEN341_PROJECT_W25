@@ -14,6 +14,104 @@
 </head>
 
 <style>
+    .form {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    .admin-input {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px; 
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    .admin-btn {
+        padding: 6px 12px;
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .admin-btn:hover {
+        background: #4a2cb5;
+    }
+
+
+    #inviteForm {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    #inputInvite {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    #invite {
+        padding: 6px 12px; 
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #invite:hover {
+        background: #4a2cb5;
+    }
+
+    #leaveChannelForm {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px; 
+        margin-left: 15px; 
+    }
+
+    #leaveChannel {
+        width: 100%; 
+        padding: 6px 12px;
+        font-size: 14px;
+        background-color: #e14b31;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #leaveChannel:hover {
+        background: #b5281a;
+    }
+
+
     #log_out_btn {
         background: none;
         border: none;
@@ -76,6 +174,16 @@
                     </button>
                 </form>
             </li>
+            <% if (username === "admin") { %>
+                <li>
+                    <a href="/adminPage" class="sidebar-btn">
+                        <i class='bx bx-arrow-back'></i>
+                        <span class="links_name">Back to Admin</span>
+                    </a>
+                    <span class="tooltip">Admin Page</span>
+                </li>
+            <% } %>
+            
         </ul>
     </div>
 

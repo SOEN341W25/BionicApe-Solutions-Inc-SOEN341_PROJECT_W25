@@ -51,11 +51,38 @@
             font-size: 1rem;
             color: #555;
         }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;  /* Moves it to the top-right corner */
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background: #6a11cb; /* Purple gradient */
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #2575fc; /* Lighter blue on hover */
+        }
+
+        .admin-container {
+            position: relative; /* Ensures the button stays positioned within the container */
+        }
+
+
+
     </style>
 </head>
 <body>
 
+    
     <div class="admin-container">
+        <a href="/adminPage" class="back-btn">Back</a>
         <h1>Edit User: <%= user.username %></h1>
 
         <h2>Current Role</h2>

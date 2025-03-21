@@ -363,6 +363,16 @@
                     </button>
                 </form>
             </li>
+            <% if (username === "admin") { %>
+                <li>
+                    <a href="/adminPage" class="sidebar-btn">
+                        <i class='bx bx-arrow-back'></i>
+                        <span class="links_name">Back to Admin</span>
+                    </a>
+                    <span class="tooltip">Admin Page</span>
+                </li>
+            <% } %>
+            
         </ul>
     </div>
     <section class="home-section">

@@ -14,16 +14,15 @@ function constructChatMessageFromJson(data) {
     return data.username + ":" + data.msg;
 }
 
-
-function addChatMessageToChatBox(msg)//create li
-{
-    const item = document.createElement('li');//creates the 'li' tag for each message sent
-    item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
-    messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul  
+function addChatMessageToChatBox(msg) {
+    const item = document.createElement('li');
+    item.textContent = constructChatMessageFromJson(msg);
+    messagesUL.appendChild(item);
     item.setAttribute("onclick", "deleteMessage(this)");
     item.setAttribute("id", msg.messageId);
     item.setAttribute("data-visibility", msg.visible);
 }
+
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (input.value) {
