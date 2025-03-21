@@ -87,10 +87,10 @@
 
             </div>
 
-            <h1 id="currentChatBoxTitle"></h1>
-            <div class="history-chatbox">
-                <ul id="messages"></ul>
-            </div>
+            <div><h1 id="currentChatBoxTitle"></h1>
+                <div class="history-chatbox">
+                    <ul id="messages"></ul>
+            </div></div>
 
         </div>
         <form id="form" action="">
@@ -140,7 +140,8 @@
                     if (users && users.length > 0) {
                         users.forEach(user => {
                             let li = document.createElement('li');
-                            let a = document.createElement('a');
+                            let a = document.createElement('a'); // For showing username
+                            let i = document.createElement('i'); // For showing userStatus
 
                             a.href = '#';
                             a.setAttribute("onclick", "selectUser(this)");
@@ -148,11 +149,16 @@
 
                             // Check if userStatus exists, otherwise use a default value
                             let userStatus = user.userStatus || "No Status"; // Default value if userStatus is missing
+                            if (userStatus == "online") {
+                                i.setAttribute("class", "userStatus_online");
+                            } else {
+                                i.setAttribute("class", "userStatus");
+                            }
+                            // Show username and userStatus
+                            a.textContent = user.username;
+                            i.textContent = userStatus;
 
-                            // Add userStatus to the displayed text
-                            a.textContent = `${user.username}`; // Combine username and userStatus TI DOESNT FUCKING WORK
-
-                            li.appendChild(a);
+                            li.appendChild(a); li.appendChild(i);
                             renderUserList.appendChild(li);
                         });
                     } else {

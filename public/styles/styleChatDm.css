@@ -370,10 +370,11 @@
     flex-direction: row;
 }
 .history-chatbox {
-  background-color: red;
-  height: 300px;
+  background-color: rgb(215, 205, 255);
   flex: 1;
   margin-right: 200px;
+  max-height: 300px;
+  overflow: auto;
 }
 
 #form {
@@ -452,4 +453,14 @@
 .sidebar .admin-btn {
   display: block;
   transition: all 0.5s ease;
+}
+
+.userStatus {
+  size: 14px;
+  color: #bdbdbd;
+}
+.userStatus_online {
+  size: 14px;
+  color: #7f00ff;
+  font-weight: bold;
 }
