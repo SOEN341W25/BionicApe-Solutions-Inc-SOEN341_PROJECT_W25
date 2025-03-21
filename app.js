@@ -323,7 +323,12 @@ app.get("/login", function (req, res) {
 });
 
 app.get('/channelChatting', function(req, res) {
-  res.render('channelChatting'); // Make sure this file exists in the "views" folder
+
+  if (!req.session.user) {
+    return res.redirect('/login'); // Ensure the user is logged in
+  }
+
+  res.render('channelChatting', {username: req.session.user }); // Make sure this file exists in the "views" folder
 });
 
 app.get('/userDM',function (req, res){
@@ -332,9 +337,13 @@ app.get('/userDM',function (req, res){
 
 //Showing channel form
 app.get("/channels", async (req, res) => {
+  if (!req.session.user) {
+    return res.redirect("/login"); // Redirect if not logged in
+  }
+
   try {
     const channels = await Channel.find({});
-    res.render("channels", { channels });
+    res.render("channels", { channels,  username: req.session.user  });
   } catch (err) {
     console.error(err);
     res.status(500).json({ error: "An error occurred while fetching channels." });

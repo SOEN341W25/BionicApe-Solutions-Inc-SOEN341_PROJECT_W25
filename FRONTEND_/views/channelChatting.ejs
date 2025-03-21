@@ -55,10 +55,14 @@
             <li class="profile">
                 <div class="profile-details">
                     <div class="name_job"><br>
-                        <div class="name">NAME OF CURRENT USER</div>
+                        <div class="name"> <%= username %> </div>
                     </div>
                 </div>
-                <i class='bx bx-log-out' id="log_out"></i>
+                <form action="/logout" method="GET" style="display: inline;">
+                    <button type="submit" id="log_out_btn" style="background: none; border: none; cursor: pointer;">
+                        <i class='bx bx-log-out' id="log_out" style="font-size: 24px; color: white;"></i>
+                    </button>
+                </form>
             </li>
         </ul>
     </div>
