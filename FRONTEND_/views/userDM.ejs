@@ -14,6 +14,104 @@
 </head>
 
 <style>
+    .form {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    .admin-input {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px; 
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    .admin-btn {
+        padding: 6px 12px;
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .admin-btn:hover {
+        background: #4a2cb5;
+    }
+
+
+    #inviteForm {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    #inputInvite {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    #invite {
+        padding: 6px 12px; 
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #invite:hover {
+        background: #4a2cb5;
+    }
+
+    #leaveChannelForm {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px; 
+        margin-left: 15px; 
+    }
+
+    #leaveChannel {
+        width: 100%; 
+        padding: 6px 12px;
+        font-size: 14px;
+        background-color: #e14b31;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #leaveChannel:hover {
+        background: #b5281a;
+    }
+
+
     #log_out_btn {
         background: none;
         border: none;
@@ -36,8 +134,12 @@
         <ul class="nav-list">
             <li>
                 <i class='bx bx-search'></i>
-                <input type="text" placeholder="Create a Channel...">
-                <span class="tooltip">CreateChannel</span>
+                <form class="form">
+                    <input type="text" class="admin-input" type="text" name="channelName" id="channelName"
+                        placeholder="Create a Channel...">
+                    <span class="tooltip">CreateChannel</span><br><br>
+                    <button class="admin-btn" type="submit">Create</button>
+                </form>
             </li>
             <li>
                 <a href="/channelChatting">
@@ -94,11 +196,17 @@
                     <ul id="messages"></ul>
             </div></div>
 
-        </div>
+        </div><br>
         <form id="form" action="">
             <input id="input" autocomplete="off" />
             <button id="toes">Send</button>
         </form>
+        <div class="waves">
+            <div class="wave wave1"></div>
+            <div class="wave wave2"></div>
+            <div class="wave wave3"></div>
+            <div class="wave wave4"></div>
+        </div>
     </section>
 
     <script>
