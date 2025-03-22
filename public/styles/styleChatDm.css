@@ -486,11 +486,15 @@
 }
 
 .userStatus {
-  size: 14px;
+  size: 12px;
   color: #bdbdbd;
 }
 .userStatus_online {
-  size: 14px;
+  size: 12px;
   color: #7f00ff;
   font-weight: bold;
+}
+#lastActiveAtTitle {
+  size: 14px;
+  color: #bdbdbd;
 }
