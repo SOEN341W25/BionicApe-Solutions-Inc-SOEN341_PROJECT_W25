@@ -24,7 +24,7 @@ const { sessionMiddleware, wrap }=require("./BACKEND_/session/serverController")
 //============================
 
 let app = express();
-const server =createServer(app);
+let server =createServer(app);
 const io= new Server(server);
 
 
@@ -601,3 +601,5 @@ let port = process.env.PORT || 3000;
 server.listen(port, function () {
     console.log("Server Has Started!");
 });
+
+module.exports = { app, server };

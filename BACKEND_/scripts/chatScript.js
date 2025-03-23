@@ -3,7 +3,9 @@ const socket = io();
 const form = document.getElementById('form');
 const input = document.getElementById('input');
 const messagesUL = document.getElementById('messages');
-
+const inviteForm = document.getElementById('inviteForm');
+const inputInvite = document.getElementById('inputInvite');
+const leaveChannelForm = document.getElementById('leaveChannelForm');
 
 
 
@@ -14,15 +16,16 @@ function constructChatMessageFromJson(data) {
     return data.username + ":" + data.msg;
 }
 
-function addChatMessageToChatBox(msg) {
-    const item = document.createElement('li');
-    item.textContent = constructChatMessageFromJson(msg);
-    messagesUL.appendChild(item);
+
+function addChatMessageToChatBox(msg)//create li
+{
+    const item = document.createElement('li');//creates the 'li' tag for each message sent
+    item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
+    messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul  
     item.setAttribute("onclick", "deleteMessage(this)");
     item.setAttribute("id", msg.messageId);
     item.setAttribute("data-visibility", msg.visible);
 }
-
 form.addEventListener('submit', (e) => {
     e.preventDefault();
     if (input.value) {
@@ -35,7 +38,21 @@ form.addEventListener('submit', (e) => {
         input.value = '';
     }
 });
-
+inviteForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (inputInvite.value) {
+        if (mode == "channel") {
+            socket.emit('channel invite', inputInvite.value, currentChannel);
+        }
+        inputInvite.value = '';
+    }
+});
+leaveChannelForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (mode == "channel") {
+        socket.emit('channel leave', currentChannel);
+    }
+});
 socket.on('channel message', (msg, channelName) => {
     console.log(channelName);
     if (channelName === currentChannel) {
@@ -50,6 +67,25 @@ socket.on('channel message', (msg, channelName) => {
         //channelToNotify.style.backgroundColor = "red"
     }
 });
+socket.on('channel invite', (channel, userExist) => {
+    if (!userExist) {
+        alert("User does not exist");
+    }
+    else {
+        alert(JSON.stringify(channel));
+
+    }
+})
+socket.on('channel leave', (userLeft) => {
+    if (userLeft) {
+        alert("User left");
+        location.reload();//refresh the page to make leaving channel dissapear
+    }
+    else {
+        alert("User fail to leave");
+    }
+
+})
 socket.on('dms to user', (msg, currentRecipient) => {
     console.log("I have received dm", msg, currentRecipient);
     if (currentRecipient === currentRecipientUser) {
@@ -80,6 +116,17 @@ function loadChatHistoryOfCurrentChannel() {
             data.messageIds.forEach(message => {
                 addChatMessageToChatBox(message);
             })
+            if (data.public == undefined || data.public == true) {
+                inviteForm.style.display = 'none';
+                leaveChannelForm.style.display = 'none';
+
+            }
+            else {
+                inviteForm.style.display = 'inline-block';
+                leaveChannelForm.style.display = 'inline-block';
+            }
+            //mongodb is not very restrictive so the schema can differ.
+            //no sql is flexible in terms of schema therefore, we need to mention both statement wheter the data is undefined and true
         })
         .catch(console.error);
 }
@@ -118,9 +165,8 @@ function selectUser(element) {
     currentRecipientUser = element.innerHTML;
     selectUsername.innerHTML = element.innerHTML;
     loadChatHistoryOfCurrentRecipientUser();
-
-
 }
+
 function deleteMessage(element) {
     let messageId = element.getAttribute("id");
     let visible = element.getAttribute("data-visibility");
@@ -149,7 +195,6 @@ socket.on('modify channel message', (message, visible) => {
 
 
 });
-
 let sidebar = document.querySelector(".sidebar");
 let closeBtn = document.querySelector("#btn");
 let searchBtn = document.querySelector(".bx-search");
@@ -173,42 +218,84 @@ function menuBtnChange() {
 }
 
 menuBtnChange();
-displayAllUser();
+displayAllChannel();
 
 var currentChannel;
+
 var currentRecipientUser;
 var mode = '';
 const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
 
-function displayAllUser() {
-    fetch('api/user')
-        .then(res => res.json())
-        .then(users => {
-            const renderUserList = document.getElementById('renderList');
-            renderUserList.innerHTML = '';
+function toggleSidebar() {
+    const sidebar = document.getElementById('sidebar');
+    const toggleBtn = document.querySelector('.toggle-btn');
 
 
-            if (users && users.length > 0) {
-                users.forEach(user => {
-                    let li = document.createElement('li');
-                    let a = document.createElement('a');
-                    a.href = '#';
-                    a.setAttribute("onclick", "selectUser(this)");
-                    li.setAttribute("id", user.username + "_id")
-                    a.textContent = user.username;
-                    li.appendChild(a);
-                    renderUserList.appendChild(li);
-                });
-            } else {
-                let li = document.createElement('li');
-                li.textContent = 'No user found. ';
-                renderUserList.appendChild(li);
-            }
+    sidebar.classList.toggle('collapsed');
 
 
-        })
+    if (sidebar.classList.contains('collapsed')) {
+        toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
+    } else {
+        toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
+    }
 }
 
-//call displayAllUser on loading page to initially populate the list
-document.addEventListener('DOMContentLoaded', displayAllUser);
+
+
+
+const formEl = document.querySelector('.form');
+
+
+formEl.addEventListener('submit', event => {
+    event.preventDefault();
+    const formData = new FormData(formEl);
+    const data = Object.fromEntries(formData);
+
+
+    fetch('/api/channel', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+        .then(res => res.json())
+        .then(data => {
+            displayAllChannel(); // Refresh the list of channels
+        })
+        .catch(err => console.log(err));
+});
+
+
+function displayAllChannel() {
+    fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
+        .then(res => res.json())
+        .then(channels => {
+            const renderList = document.getElementById('renderList');
+            renderList.innerHTML = ''; // Clear the current list
+
+
+            if (channels && channels.length > 0) {
+                channels.forEach(channel => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.setAttribute("onclick", "selectChannel(this)");
+                    li.setAttribute("id", channel.channelName + "_id")
+                    a.textContent = channel.channelName;
+                    li.appendChild(a);
+                    renderList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No channels found.';
+                renderList.appendChild(li);
+            }
+        })
+        .catch(err => console.log(err));
+}
+
+// Call displayAllChannel on loading page to initially populate the list
+document.addEventListener('DOMContentLoaded', displayAllChannel);
 

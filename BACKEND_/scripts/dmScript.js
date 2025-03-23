@@ -1,3 +1,78 @@
+let sidebar = document.querySelector(".sidebar");
+let closeBtn = document.querySelector("#btn");
+let searchBtn = document.querySelector(".bx-search");
+displayAllUser();
+
+closeBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    menuBtnChange();
+})
+
+searchBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    menuBtnChange();
+})
+
+function menuBtnChange() {
+    if (sidebar.classList.contains("open")) {
+        closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+    } else {
+        closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+    }
+}
+
+menuBtnChange();
+var currentChannel;
+var currentRecipientUser;
+var mode = '';
+const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
+
+function displayAllUser() {
+    fetch('api/user')
+        .then(res => res.json())
+        .then(users => {
+            const renderUserList = document.getElementById('renderList');
+            renderUserList.innerHTML = '';
+
+
+            if (users && users.length > 0) {
+                users.forEach(user => {
+                    let li = document.createElement('li');
+                    let a = document.createElement('a'); // For showing username
+                    let i = document.createElement('i'); // For showing userStatus
+
+                    a.href = '#';
+                    a.setAttribute("onclick", "selectUser(this)");
+                    li.setAttribute("id", user.username + "_id");
+
+                    // Check if userStatus exists, otherwise use a default value
+                    let userStatus = user.userStatus || "No Status"; // Default value if userStatus is missing
+                    if (userStatus == "online") {
+                        i.setAttribute("class", "userStatus_online");
+                    } else {
+                        i.setAttribute("class", "userStatus");
+                    }
+                    // Show username and userStatus
+                    a.textContent = user.username;
+                    i.textContent = userStatus;
+
+                    li.appendChild(a); li.appendChild(i);
+                    renderUserList.appendChild(li);
+                });
+            } else {
+                let li = document.createElement('li');
+                li.textContent = 'No user found.';
+                renderUserList.appendChild(li);
+            }
+
+
+        })
+}
+
+//call displayAllUser on loading page to initially populate the list
+document.addEventListener('DOMContentLoaded', displayAllUser);
+
+
 const socket = io();
 
 const form = document.getElementById('form');
@@ -65,7 +140,6 @@ socket.on('dms to user', (msg, currentRecipient) => {
         //channelToNotify.style.backgroundColor = "red"
     }
 });
-
 function clearBox(elementID) {
     console.log(elementID);
     let element = document.getElementById(elementID);
@@ -91,13 +165,25 @@ function loadChatHistoryOfCurrentRecipientUser() {
         .then((data) => {
             console.log(JSON.stringify(data))
             clearBox("messages");
+            clearBox("lastActiveAtTitle");
             data.userDMs.forEach(dms => {
                 if (dms.recipientUser == currentRecipientUser) {
+                    // Show message history
                     dms.messageIds.forEach(individualMessage => {
                         addChatMessageToChatBox(individualMessage);
                     })
+                    // Show last active time
+                    const lastActiveAt = document.getElementById("lastActiveAtTitle");
+                    fetch("/api/user/getuser/" + currentRecipientUser)
+                        .then((res) => res.json())
+                        .then((data) => {
+                            console.log(JSON.stringify(data))
+                            const activeDate = new Date(data.lastActivateAt);
+                            lastActiveAt.innerHTML = "Last active on " + activeDate.toDateString() + " at " + activeDate.toLocaleTimeString();
+                            return data;
+                        })
+                        .catch(console.error);
                 }
-
             })
         })
         .catch(console.error);
@@ -120,9 +206,8 @@ function selectUser(element) {
     currentRecipientUser = element.innerHTML;
     selectUsername.innerHTML = element.innerHTML;
     loadChatHistoryOfCurrentRecipientUser();
-
-
 }
+
 function deleteMessage(element) {
     let messageId = element.getAttribute("id");
     let visible = element.getAttribute("data-visibility");
@@ -151,107 +236,3 @@ socket.on('modify channel message', (message, visible) => {
 
 
 });
-
-let sidebar = document.querySelector(".sidebar");
-let closeBtn = document.querySelector("#btn");
-let searchBtn = document.querySelector(".bx-search");
-
-closeBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    menuBtnChange();
-})
-
-searchBtn.addEventListener("click", () => {
-    sidebar.classList.toggle("open");
-    menuBtnChange();
-})
-
-function menuBtnChange() {
-    if (sidebar.classList.contains("open")) {
-        closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
-    } else {
-        closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-    }
-}
-
-menuBtnChange();
-displayAllChannel();
-
-var currentChannel;
-var currentRecipientUser;
-var mode = '';
-const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
-
-function toggleSidebar() {
-    const sidebar = document.getElementById('sidebar');
-    const toggleBtn = document.querySelector('.toggle-btn');
-
-
-    sidebar.classList.toggle('collapsed');
-
-
-    if (sidebar.classList.contains('collapsed')) {
-        toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
-    } else {
-        toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
-    }
-}
-
-
-
-
-const formEl = document.querySelector('.form');
-
-
-formEl.addEventListener('submit', event => {
-    event.preventDefault();
-    const formData = new FormData(formEl);
-    const data = Object.fromEntries(formData);
-
-
-    fetch('/api/channel', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-    })
-        .then(res => res.json())
-        .then(data => {
-            displayAllChannel(); // Refresh the list of channels
-        })
-        .catch(err => console.log(err));
-});
-
-
-function displayAllChannel() {
-    fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
-        .then(res => res.json())
-        .then(channels => {
-            const renderList = document.getElementById('renderList');
-            renderList.innerHTML = ''; // Clear the current list
-
-
-            if (channels && channels.length > 0) {
-                channels.forEach(channel => {
-                    const li = document.createElement('li');
-                    const a = document.createElement('a');
-                    a.href = '#';
-                    a.setAttribute("onclick", "selectChannel(this)");
-                    li.setAttribute("id", channel.channelName + "_id")
-                    a.textContent = channel.channelName;
-                    li.appendChild(a);
-                    renderList.appendChild(li);
-                });
-            } else {
-                const li = document.createElement('li');
-                li.textContent = 'No channels found.';
-                renderList.appendChild(li);
-            }
-        })
-        .catch(err => console.log(err));
-}
-
-// Call displayAllChannel on loading page to initially populate the list
-document.addEventListener('DOMContentLoaded', displayAllChannel);
-
