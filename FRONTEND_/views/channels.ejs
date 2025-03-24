@@ -24,7 +24,7 @@
         top: 0;
         height: 100%;
         width: 78px;
-        background: #5D3FD3;
+        background: rgb(93, 63, 211);
         padding: 6px 14px;
         z-index: 1;
         transition: all 0.5s ease;
@@ -57,7 +57,6 @@
         font-weight: 600;
         opacity: 0;
         transition: opacity 0.5s ease 0.3s;
-        /* Delay only for opening */
     }
 
     .sidebar.open .logo-details .main_logo {
@@ -66,7 +65,6 @@
 
     .sidebar:not(.open) .logo-details .main_logo {
         transition: opacity 0.2s ease 0s;
-        /* No delay when closing, and faster transition */
         opacity: 0;
     }
 
@@ -166,7 +164,7 @@
         align-items: center;
         text-decoration: none;
         transition: all 0.4s ease;
-        background: #7F00FF;
+        background: rgb(127, 0, 255);
     }
 
     .sidebar li a:hover {

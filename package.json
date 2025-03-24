@@ -5,7 +5,6 @@
   "scripts": {
     "test": "jest",
     "app": "test all basic features"
-
   },
   "keywords": [],
   "author": "",

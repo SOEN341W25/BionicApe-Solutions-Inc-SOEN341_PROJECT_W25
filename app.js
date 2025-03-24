@@ -332,7 +332,11 @@ app.get('/channelChatting', function(req, res) {
 });
 
 app.get('/userDM',function (req, res){
-  res.render('userDM'); // Make sure this file exists in the "views" folder
+  if (!req.session.user) {
+    return res.redirect('/login'); // Ensure the user is logged in
+  }
+
+  res.render('userDM', { username: req.session.user }); // Make sure this file exists in the "views" folder
 });
 
 //Showing channel form
