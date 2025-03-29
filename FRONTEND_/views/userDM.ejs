@@ -168,7 +168,7 @@
                         <div class="name"><%= username %></div>
                     </div>
                 </div>
-                <form action="/logout" method="GET" style="display: inline;">
+                <form style="display: inline;" id="logoutForm";>
                     <button type="submit" id="log_out_btn">
                         <i class='bx bx-log-out' id="log_out"></i>
                     </button>
@@ -290,6 +290,8 @@
         const socket = io();
 
         const form = document.getElementById('form');
+        const logoutForm = document.getElementById('logoutForm');
+
         const input = document.getElementById('input');
         const messagesUL = document.getElementById('messages');
 
@@ -326,6 +328,12 @@
             }
         });
 
+        logoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            socket.emit('log out');
+            window.location.href = "/logout"
+        });
+
         socket.on('channel message', (msg, channelName) => {
             console.log(channelName);
             if (channelName === currentChannel) {
@@ -340,6 +348,8 @@
                 //channelToNotify.style.backgroundColor = "red"
             }
         });
+
+        
         socket.on('dms to user', (msg, currentRecipient) => {
             console.log("I have received dm", msg, currentRecipient);
             if (currentRecipient === currentRecipientUser) {
@@ -354,6 +364,26 @@
                 //channelToNotify.style.backgroundColor = "red"
             }
         });
+
+        socket.on('user status',  (currentRecipient)=>{
+            const liUserNameToUpdate = document.getElementById(currentRecipient.username + "_id");
+            
+            let i = liUserNameToUpdate.getElementsByTagName('i');
+
+            
+            // Check if userStatus exists, otherwise use a default value
+            
+            if (currentRecipient.userStatus == "online") {
+                 i[0].setAttribute("class", "userStatus_online");
+            } else {
+                  i[0].setAttribute("class", "userStatus");
+            }
+            i[0].textContent = currentRecipient.userStatus;
+            console.log("the recipient's status has changed", currentRecipient);
+        
+        }); 
+
+        
         function clearBox(elementID) {
             console.log(elementID);
             let element = document.getElementById(elementID);
