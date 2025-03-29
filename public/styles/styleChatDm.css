@@ -456,7 +456,7 @@
   height: 300px;
   overflow-y: auto;
   display: flex;
-  flex-direction: column;
+  flex-direction: column-reverse;
   border-radius: 8px;
 }
 
@@ -575,4 +575,21 @@
 #lastActiveAtTitle {
   size: 14px;
   color: #bdbdbd;
+}
+
+
+#emoji-box {
+  position: absolute;
+  background: white;
+  border: 1px solid #ccc;
+  padding: 10px;
+  display: none;
+  max-height: 144px;
+  overflow-y: scroll;
+}
+
+.emoji {
+  cursor: pointer;
+  font-size: 20px;
+  margin: 5px;
 }
