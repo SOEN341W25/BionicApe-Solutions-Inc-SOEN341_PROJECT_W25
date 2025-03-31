@@ -110,4 +110,3 @@ describe('Message Functionality Acceptance Tests', () => {
     // Should contain "Last active" text (exact format may vary)
     expect(lastActiveText).toMatch(/Last active/i);
   });
-});
