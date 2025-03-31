@@ -2,9 +2,9 @@ name: ChatHaven CI/CD Pipeline
 
 on:
   push:
-    branches: [ "main" ]
+    branches: [ "seperate-branch" ]
   pull_request:
-    branches: [ "main" ]
+    branches: [ "seperate-branch" ]
   workflow_dispatch:
 
 jobs:
@@ -219,7 +219,7 @@ jobs:
     name: Build Application
     runs-on: ubuntu-latest
     needs: [unit-tests, integration-tests, acceptance-tests]
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/seperate-branch'
     
     steps:
       - name: Checkout repository
@@ -254,7 +254,7 @@ jobs:
     runs-on: ubuntu-latest
     needs: build
     environment: development
-    if: github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/seperate-branch'
     
     steps:
       - name: Download build artifacts
