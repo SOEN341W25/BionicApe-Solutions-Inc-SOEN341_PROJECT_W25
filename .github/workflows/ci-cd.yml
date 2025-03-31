@@ -22,7 +22,7 @@ jobs:
               "name": "chathaven",
               "version": "1.0.0",
               "description": "ChatHaven real-time chat application",
-              "main": "app.js",
+              "seperate-branch": "app.js",
               "scripts": {
                 "start": "node app.js",
                 "test": "jest"
