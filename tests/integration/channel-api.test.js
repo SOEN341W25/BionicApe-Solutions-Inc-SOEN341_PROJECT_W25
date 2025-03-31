@@ -1,109 +1,64 @@
-// tests/integration/channel-api.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
 const { MongoMemoryServer } = require('mongodb-memory-server');
 const express = require('express');
-const Channel = require('../../model/Channel');
-const Message = require('../../model/Message');
+const User = require('../../model/User');
 
-// Mock express application setup
+// Create a minimal Express application for testing
 const app = express();
 app.use(express.json());
 
-// Import routes (assuming these exist in your project)
-app.get('/api/channel', async (req, res) => {
+// User API routes
+app.get('/api/user', async (req, res) => {
   try {
-    const channels = await Channel.find({});
-    res.json(channels);
+    const users = await User.find({});
+    res.json(users);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.get('/api/channel/:channelName', async (req, res) => {
+app.get('/api/user/getuser/:username', async (req, res) => {
   try {
-    const channel = await Channel.findOne({ channelName: req.params.channelName })
-      .populate('messageIds');
-    
-    if (!channel) {
-      return res.status(404).json({ error: 'Channel not found' });
+    const user = await User.findOne({ username: req.params.username });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    
-    res.json(channel);
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-app.post('/api/channel', async (req, res) => {
+app.put('/api/user/:username', async (req, res) => {
   try {
-    const channel = new Channel(req.body);
-    await channel.save();
-    res.status(201).json(channel);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-app.post('/api/channel/:channelName/message', async (req, res) => {
-  try {
-    const channel = await Channel.findOne({ channelName: req.params.channelName });
-    
-    if (!channel) {
-      return res.status(404).json({ error: 'Channel not found' });
-    }
-    
-    const message = new Message({
-      messageId: req.body.messageId || 0,
-      msg: req.body.msg,
-      username: req.body.username,
-      visible: true
-    });
-    
-    await message.save();
-    
-    channel.messageIds.push(message._id);
-    await channel.save();
-    
-    res.status(201).json(message);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-app.put('/api/channel/:channelName', async (req, res) => {
-  try {
-    const channel = await Channel.findOneAndUpdate(
-      { channelName: req.params.channelName },
+    const user = await User.findOneAndUpdate(
+      { username: req.params.username },
       req.body,
       { new: true }
     );
-    
-    if (!channel) {
-      return res.status(404).json({ error: 'Channel not found' });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
     }
-    
-    res.json(channel);
-  } catch (error) {
-    res.status(400).json({ error: error.message });
-  }
-});
-
-app.delete('/api/channel/:channelName', async (req, res) => {
-  try {
-    const channel = await Channel.findOneAndDelete({ channelName: req.params.channelName });
-    
-    if (!channel) {
-      return res.status(404).json({ error: 'Channel not found' });
-    }
-    
-    res.json({ success: true, message: 'Channel deleted' });
+    res.json(user);
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
 });
 
-describe('Channel API Integration Tests', () => {
+app.get('/api/user/userDMs/:recipientUser', async (req, res) => {
+  try {
+    const user = await User.findOne({ username: req.params.recipientUser });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+    res.json(user);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+describe('User API Integration Tests', () => {
   let mongoServer;
 
   beforeAll(async () => {
@@ -122,181 +77,129 @@ describe('Channel API Integration Tests', () => {
 
   beforeEach(async () => {
     // Clear the database between tests
-    await Channel.deleteMany({});
-    await Message.deleteMany({});
+    await User.deleteMany({});
   });
 
-  test('GET /api/channel should return all channels', async () => {
-    // Add test channels
-    await Channel.create({
-      channelName: 'general',
-      users: ['user1', 'user2'],
-      public: true
+  test('GET /api/user should return all users', async () => {
+    // Add test users
+    await User.create({
+      username: 'testuser1',
+      password: 'password1',
+      role: 'NormalUser',
+      channels: ['General'],
+      userStatus: 'online'
     });
     
-    await Channel.create({
-      channelName: 'random',
-      users: ['user1', 'user3'],
-      public: true
+    await User.create({
+      username: 'testuser2',
+      password: 'password2',
+      role: 'NormalUser',
+      channels: ['General'],
+      userStatus: 'offline'
     });
     
     // Make API request
     const response = await request(app)
-      .get('/api/channel')
+      .get('/api/user')
       .expect('Content-Type', /json/)
       .expect(200);
     
     expect(response.body.length).toBe(2);
-    expect(response.body[0].channelName).toBe('general');
-    expect(response.body[1].channelName).toBe('random');
+    expect(response.body[0].username).toBe('testuser1');
+    expect(response.body[1].username).toBe('testuser2');
   });
 
-  test('GET /api/channel/:channelName should return channel with messages', async () => {
-    // Create messages
-    const message1 = new Message({
-      messageId: 1,
-      msg: 'Hello channel',
-      username: 'user1',
-      visible: true
-    });
-    
-    const message2 = new Message({
-      messageId: 2,
-      msg: 'Second message',
-      username: 'user2',
-      visible: true
-    });
-    
-    await message1.save();
-    await message2.save();
-    
-    // Add test channel with messages
-    await Channel.create({
-      channelName: 'general',
-      messageIds: [message1._id, message2._id],
-      users: ['user1', 'user2'],
-      public: true
+  test('GET /api/user/getuser/:username should return user by username', async () => {
+    // Add test user
+    await User.create({
+      username: 'specificuser',
+      password: 'password123',
+      role: 'NormalUser',
+      channels: ['General', 'Random'],
+      userStatus: 'online'
     });
     
     // Make API request
     const response = await request(app)
-      .get('/api/channel/general')
+      .get('/api/user/getuser/specificuser')
       .expect('Content-Type', /json/)
       .expect(200);
     
-    expect(response.body.channelName).toBe('general');
-    expect(response.body.messageIds).toHaveLength(2);
-    expect(response.body.messageIds[0].msg).toBe('Hello channel');
-    expect(response.body.messageIds[1].msg).toBe('Second message');
+    expect(response.body.username).toBe('specificuser');
+    expect(response.body.role).toBe('NormalUser');
+    expect(response.body.channels).toContain('General');
+    expect(response.body.channels).toContain('Random');
+    expect(response.body.userStatus).toBe('online');
   });
 
-  test('POST /api/channel should create a new channel', async () => {
-    const channelData = {
-      channelName: 'newchannel',
-      users: ['creator'],
-      public: false
-    };
-    
-    // Make API request
+  test('GET /api/user/getuser/:username should return 404 for non-existent user', async () => {
+    // Make API request for non-existent user
     const response = await request(app)
-      .post('/api/channel')
-      .send(channelData)
+      .get('/api/user/getuser/nonexistentuser')
       .expect('Content-Type', /json/)
-      .expect(201);
+      .expect(404);
     
-    expect(response.body.channelName).toBe('newchannel');
-    expect(response.body.users).toContain('creator');
-    expect(response.body.public).toBe(false);
-    
-    // Verify in database
-    const savedChannel = await Channel.findOne({ channelName: 'newchannel' });
-    expect(savedChannel).not.toBeNull();
-    expect(savedChannel.channelName).toBe('newchannel');
+    expect(response.body.error).toBe('User not found');
   });
 
-  test('POST /api/channel/:channelName/message should add a message to a channel', async () => {
-    // Create channel
-    await Channel.create({
-      channelName: 'general',
-      users: ['user1', 'user2'],
-      public: true
-    });
-    
-    // Message data
-    const messageData = {
-      messageId: 5,
-      msg: 'New message in channel',
-      username: 'user1'
-    };
-    
-    // Make API request
-    const response = await request(app)
-      .post('/api/channel/general/message')
-      .send(messageData)
-      .expect('Content-Type', /json/)
-      .expect(201);
-    
-    expect(response.body.msg).toBe('New message in channel');
-    expect(response.body.username).toBe('user1');
-    expect(response.body.visible).toBe(true);
-    
-    // Verify channel has message
-    const updatedChannel = await Channel.findOne({ channelName: 'general' }).populate('messageIds');
-    expect(updatedChannel.messageIds).toHaveLength(1);
-    expect(updatedChannel.messageIds[0].msg).toBe('New message in channel');
-  });
-
-  test('PUT /api/channel/:channelName should update channel data', async () => {
-    // Create channel
-    await Channel.create({
-      channelName: 'general',
-      users: ['user1'],
-      public: true
+  test('PUT /api/user/:username should update user data', async () => {
+    // Add test user
+    await User.create({
+      username: 'updateuser',
+      password: 'oldpassword',
+      role: 'NormalUser',
+      channels: ['General'],
+      userStatus: 'offline'
     });
     
     // Update data
     const updateData = {
-      users: ['user1', 'user2', 'user3'],
-      public: false
+      role: 'Admin',
+      userStatus: 'online',
+      channels: ['General', 'Admin']
     };
     
     // Make API request
     const response = await request(app)
-      .put('/api/channel/general')
+      .put('/api/user/updateuser')
       .send(updateData)
       .expect('Content-Type', /json/)
       .expect(200);
     
-    expect(response.body.channelName).toBe('general');
-    expect(response.body.users).toHaveLength(3);
-    expect(response.body.users).toContain('user2');
-    expect(response.body.users).toContain('user3');
-    expect(response.body.public).toBe(false);
+    expect(response.body.username).toBe('updateuser');
+    expect(response.body.role).toBe('Admin');
+    expect(response.body.userStatus).toBe('online');
+    expect(response.body.channels).toContain('Admin');
     
     // Verify in database
-    const updatedChannel = await Channel.findOne({ channelName: 'general' });
-    expect(updatedChannel.public).toBe(false);
-    expect(updatedChannel.users).toHaveLength(3);
+    const updatedUser = await User.findOne({ username: 'updateuser' });
+    expect(updatedUser.role).toBe('Admin');
+    expect(updatedUser.userStatus).toBe('online');
   });
 
-  test('DELETE /api/channel/:channelName should delete a channel', async () => {
-    // Create channel
-    await Channel.create({
-      channelName: 'deleteme',
-      users: ['user1'],
-      public: true
+  test('GET /api/user/userDMs/:recipientUser should return user DMs', async () => {
+    // Create a message ID for reference
+    const messageId = new mongoose.Types.ObjectId();
+    
+    // Add test user with DMs
+    await User.create({
+      username: 'dmuser',
+      password: 'password123',
+      role: 'NormalUser',
+      userDMs: [{
+        recipientUser: 'recipient',
+        messageIds: [messageId]
+      }]
     });
     
     // Make API request
     const response = await request(app)
-      .delete('/api/channel/deleteme')
+      .get('/api/user/userDMs/dmuser')
       .expect('Content-Type', /json/)
       .expect(200);
     
-    expect(response.body.success).toBe(true);
-    
-    // Verify channel is deleted
-    const deletedChannel = await Channel.findOne({ channelName: 'deleteme' });
-    expect(deletedChannel).toBeNull();
+    expect(response.body.username).toBe('dmuser');
+    expect(response.body.userDMs).toHaveLength(1);
+    expect(response.body.userDMs[0].recipientUser).toBe('recipient');
+    expect(response.body.userDMs[0].messageIds).toHaveLength(1);
   });
-});
