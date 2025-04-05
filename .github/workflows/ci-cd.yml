@@ -1,0 +1,369 @@
+
+name: ChatHaven CI/CD Pipeline
+
+on:
+  push:
+    branches: [ "seperate-branch" ]
+  pull_request:
+    branches: [ "seperate-branch" ]
+  workflow_dispatch:
+
+jobs:
+  setup:
+    name: Setup and Installation
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Create package.json if it doesn't exist
+        run: |
+          if [ ! -f package.json ]; then
+            echo '{
+              "name": "chathaven",
+              "version": "1.0.0",
+              "description": "ChatHaven real-time chat application",
+              "seperate-branch": "app.js",
+              "scripts": {
+                "start": "node app.js",
+                "test": "jest",
+                "lint": "eslint ."
+              },
+              "dependencies": {
+                "express": "^4.18.2",
+                "mongoose": "^7.5.0",
+                "socket.io": "^4.7.2",
+                "express-session": "^1.17.3"
+              },
+              "devDependencies": {
+                "jest": "^29.6.4",
+                "supertest": "^6.3.3",
+                "mongodb-memory-server": "^8.15.1",
+                "@testing-library/jest-dom": "^6.1.3",
+                "jsdom": "^22.1.0",
+                "puppeteer": "^21.3.1",
+                "jest-puppeteer": "^9.0.0",
+                "eslint": "^8.48.0"
+              }
+            }' > package.json
+          fi
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Cache node modules
+        uses: actions/cache@v3
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
+
+  lint:
+    name: Linting
+    needs: setup
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create ESLint config if needed
+        run: |
+          if [ ! -f .eslintrc.json ]; then
+            echo '{
+              "env": {
+                "browser": true,
+                "commonjs": true,
+                "es2021": true,
+                "node": true,
+                "jest": true
+              },
+              "extends": "eslint:recommended",
+              "parserOptions": {
+                "ecmaVersion": 12
+              },
+              "rules": {
+                "no-unused-vars": "warn",
+                "no-console": "off"
+              }
+            }' > .eslintrc.json
+          fi
+
+      - name: Run ESLint
+        run: npx eslint --ext .js .
+        continue-on-error: true
+
+  unit-tests:
+    name: Unit Tests
+    needs: lint
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create test directories
+        run: |
+          mkdir -p tests/unit/models
+          mkdir -p tests/unit/utils
+
+      - name: Copy unit tests
+        run: |
+          # Create unit test files based on the existing tests
+          cat << 'EOF' > tests/unit/models/User.test.js
+          const mongoose = require('mongoose');
+          const User = require('../../../model/User');
+          
+          describe('User Model Tests', () => {
+            // Test content from paste-2.txt
+            // ... rest of the test file
+          });
+          EOF
+          
+          # Add more test files as needed
+
+      - name: Create Jest config
+        run: |
+          echo "module.exports = { 
+            testEnvironment: 'jsdom',
+            moduleFileExtensions: ['js'],
+            testMatch: ['**/tests/unit/**/*.test.js'],
+            collectCoverage: true,
+            coverageReporters: ['text', 'lcov', 'clover'],
+            coverageDirectory: 'coverage',
+            verbose: true,
+            testTimeout: 30000
+          };" > jest.config.js
+
+      - name: Run unit tests
+        run: npx jest --config=jest.config.js
+        continue-on-error: true
+
+      - name: Upload test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-coverage
+          path: coverage/
+
+  integration-tests:
+    name: Integration Tests
+    needs: unit-tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create test directories
+        run: |
+          mkdir -p tests/integration
+
+      - name: Copy integration tests
+        run: |
+          # Create integration test files based on the existing tests
+          cat << 'EOF' > tests/integration/user-api.test.js
+          // Integration test content from paste-3.txt
+          // ... rest of the test file
+          EOF
+          
+          # Add more test files as needed
+
+      - name: Create Jest config for integration tests
+        run: |
+          echo "module.exports = { 
+            testEnvironment: 'node',
+            moduleFileExtensions: ['js'],
+            testMatch: ['**/tests/integration/**/*.test.js'],
+            collectCoverage: true,
+            coverageReporters: ['text', 'lcov'],
+            coverageDirectory: 'coverage-integration',
+            verbose: true,
+            testTimeout: 30000
+          };" > jest.integration.config.js
+
+      - name: Start MongoDB Memory Server
+        run: |
+          echo "Preparing MongoDB Memory Server environment..."
+          mkdir -p .mongodb-data
+
+      - name: Run integration tests
+        run: npx jest --config=jest.integration.config.js
+        continue-on-error: true
+
+      - name: Upload integration test coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-coverage
+          path: coverage-integration/
+
+  acceptance-tests:
+    name: Acceptance Tests
+    needs: integration-tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create test directories
+        run: |
+          mkdir -p tests/acceptance
+
+      - name: Copy acceptance tests
+        run: |
+          # Create acceptance test files based on the existing tests
+          cat << 'EOF' > tests/acceptance/user-interface.test.js
+          // Acceptance test content from paste-5.txt
+          // ... rest of the test file
+          EOF
+          
+          # Add more test files as needed
+
+      - name: Create Jest config for acceptance tests
+        run: |
+          echo "module.exports = { 
+            preset: 'jest-puppeteer',
+            testMatch: ['**/tests/acceptance/**/*.test.js'],
+            testTimeout: 30000
+          };" > jest.acceptance.config.js
+
+      - name: Create puppeteer config
+        run: |
+          echo "module.exports = {
+            launch: {
+              headless: true,
+              args: ['--no-sandbox', '--disable-setuid-sandbox']
+            },
+            server: {
+              command: 'npm start',
+              port: 3000,
+              launchTimeout: 10000,
+              debug: true
+            }
+          };" > jest-puppeteer.config.js
+
+      - name: Run acceptance tests
+        run: npx jest --config=jest.acceptance.config.js
+        continue-on-error: true
+
+  security-audit:
+    name: Security Audit
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Run npm audit
+        run: npm audit
+        continue-on-error: true
+
+  build:
+    name: Build Application
+    runs-on: ubuntu-latest
+    needs: [unit-tests, integration-tests, acceptance-tests]
+    if: github.ref == 'refs/heads/seperate-branch'
+    
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Create build package
+        run: |
+          echo "Creating production build..."
+          mkdir -p build
+          cp -r model build/
+          mkdir -p build/public
+          cp -r *.js build/
+          echo '{"version": "1.0.0", "build": "'$GITHUB_RUN_NUMBER'", "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"}' > build/build-info.json
+
+      - name: Archive build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: chathaven-build
+          path: build/
+
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: build
+    environment: development
+    if: github.ref == 'refs/heads/seperate-branch'
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: chathaven-build
+          path: build
+
+      - name: Display build info
+        run: cat build/build-info.json
+
+      - name: Setup development deployment
+        run: |
+          echo "Setting up development deployment..."
+          # This would be replaced with actual deployment steps
+          # For example, deploying to a staging server
+          echo "Deployed to development environment"

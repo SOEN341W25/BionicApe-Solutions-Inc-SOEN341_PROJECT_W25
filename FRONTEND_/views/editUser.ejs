@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Edit User - <%= user.username %></title>
+    <link rel="icon" href="/images/favicon.ico"/>
+    <link rel="stylesheet" href="/styles/style.css">
+    <style>
+        /* Custom styles to ensure everything stays in the left column */
+        .admin-container {
+            width: 100%;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+            display: flex;
+            flex-direction: column; /* Ensure vertical stacking */
+            gap: 1.5rem; /* Add space between elements */
+        }
+
+        h1, h2 {
+            margin: 0;
+            color: #333;
+        }
+
+        .form {
+            width: 100%;
+        }
+
+        .form input, .form button {
+            display: block;
+            width: 100%;
+            margin-bottom: 1rem;
+            padding: 0.75rem;
+            font-size: 1rem;
+        }
+
+        .form button {
+            background-color: #6a11cb;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .form button:hover {
+            background-color: #2575fc;
+        }
+
+        p {
+            font-size: 1rem;
+            color: #555;
+        }
+
+        .back-btn {
+            position: absolute;
+            top: 20px;
+            right: 20px;  /* Moves it to the top-right corner */
+            padding: 8px 12px;
+            font-size: 14px;
+            font-weight: bold;
+            color: white;
+            background: #6a11cb; /* Purple gradient */
+            border-radius: 5px;
+            text-decoration: none;
+            transition: background 0.3s;
+        }
+
+        .back-btn:hover {
+            background: #2575fc; /* Lighter blue on hover */
+        }
+
+        .admin-container {
+            position: relative; /* Ensures the button stays positioned within the container */
+        }
+
+
+
+    </style>
+</head>
+<body>
+
+    
+    <div class="admin-container">
+        <a href="/adminPage" class="back-btn">Back</a>
+        <h1>Edit User: <%= user.username %></h1>
+
+        <h2>Current Role</h2>
+        <p id="currentRole"></p>
+
+        <h2>Edit Role</h2>
+        <form class="form">
+            <input type="text" name="role" placeholder="Change Role"/>
+            <button type="submit">Submit</button>
+        </form>
+
+        <p id="resultOfCreation"></p>
+    </div>
+
+    <script>
+        displayCurrentUser();
+        const formEl = document.querySelector('.form');
+        
+        formEl.addEventListener('submit', event => {
+            event.preventDefault(); // Prevent page refresh on submit
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+            
+            fetch('/api/user/<%= user.username %>', {
+                method: 'PUT',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then((res) => res.json())
+            .then((data) => {
+                document.getElementById("resultOfCreation").innerHTML = "Updated";
+                displayCurrentUser();
+            })
+            .catch(console.error);
+        });
+
+        function displayCurrentUser() {
+            fetch("/api/user/<%= user.username %>")
+            .then((res) => res.json())
+            .then((data) => {
+                console.log(JSON.stringify(data));
+                document.getElementById("currentRole").innerHTML = data.role;
+            })
+            .catch(console.error);
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang-="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, intial-scaled=1.0">
+	<link rel="stylesheet" href="/styles/style.css">
+    <title>Admin Hub</title>
+    <link rel="icon" href="/images/favicon.ico"/>
+
+</head>
+
+
+<!-- frontend, it is time to shine and fix the checkbox for public channel :)-->
+<body>
+	<div class="admin-container">
+	<div class="admin-left-column">
+	<h1 class="admin-title">Admin Hub</h1>
+	<form class ="form">
+		<input class="admin-input" type="text" name="channelName" placeholder="channelName"/>
+        <input type="checkbox" id="publicChannel" name="public" value="true"/>
+        <label for="publicChannel">public channel</label> <br>
+		<button class="admin-btn" type="submit">Create</button>
+	</form>
+    
+	<p class="admin-result" id="resultOfCreation">
+	
+	</p>
+	
+	<h1 class="admin-user-list">List of Users</h1>
+    <ul>
+        <% users.forEach(user=> { %>
+            <li class="admin-user-item">
+                <a class="admin-user-link" href="/editUser?username=<%= user.username %>"> <%= user.username %> by <%= user.role %> </a>
+            </li>
+        <% }); %>
+    </ul>
+	<a class="logout-btn" href="/logout">Logout</a>
+	<a href="/channels"><u>View channels</u></a>
+	</div>
+
+	<div class="admin-right-column">
+		<h1 class="admin-section-title">List of Channels</h1>
+		<div class ="admin-channel-list" id="renderList">
+	</div>
+		
+	</div>
+</div>
+	<script>
+	 	const formEl = document.querySelector('.form');
+        
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+
+            fetch('/api/channel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+            .then(res => res.json())
+            .then(data => {
+                document.getElementById("resultOfCreation").innerHTML = "Channel Created Successfully!";
+                displayAllChannel();
+            })
+            .catch(console.error);
+        });
+
+        displayAllChannel();
+
+        function createList(data) {
+            clearBox('renderList');
+            const ul = document.createElement('ul');
+            ul.setAttribute('id', 'proList');
+            document.getElementById('renderList').appendChild(ul);
+
+            data.forEach(element => {
+                const li = document.createElement('li');
+                li.setAttribute('class', 'item');
+                ul.appendChild(li);
+
+                const a = document.createElement('a');
+                a.innerHTML = element.channelName;
+                a.setAttribute('href', '/editChannel?channelName=' + element.channelName);
+                li.appendChild(a);
+            });
+        }
+
+        function displayAllChannel() {
+            fetch("/api/channel")
+                .then(res => res.json())
+                .then(data => {
+                    createList(data);
+                })
+                .catch(console.error);
+        }
+
+        function clearBox(elementID) {
+            document.getElementById(elementID).innerHTML = "";
+        }
+    </script>
+</body>
+</html>

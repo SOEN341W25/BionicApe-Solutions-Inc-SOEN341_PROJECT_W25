@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Channels</title>
+    <link rel="icon" href="/images/favicon.ico"/>
+    <link rel="stylesheet" href="/styles/style.css">
+    <style>
+        .sidebar {
+            width: 250px;
+            height: 100vh;
+            background-color: #003fab;
+            position: fixed;
+            left: 0;
+            top: 0;
+            padding-top: 20px;
+            color: white;
+            transition: transform 0.3s ease-in-out;
+            overflow-y: auto;
+            max-height: 600px;
+        }
+
+
+        .sidebar.collapsed {
+            transform: translateX(-250px);
+        }
+
+
+        .sidebar a {
+            display: block;
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            border: 1px none rgb(0, 0, 0);
+            border-radius: 10px;
+            margin-bottom: 2px
+        }
+
+
+        .sidebarnotify a{
+            background-color: #0b7bc1;
+        }
+
+
+        .sidebar a:hover {
+            background-color: #002d7b;
+        }
+
+
+        /* a[href="http://localhost:3000/api/user/channels"] {
+           
+            display: block;
+            color: white;
+            padding: 15px 20px;
+            text-decoration: none;
+            background-color: red;
+        } */
+
+
+
+
+        .toggle-btn {
+            position: fixed;
+            left: 260px;
+            top: 20px;
+            background-color: #003fab;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            padding: 10px;
+            cursor: pointer;
+            z-index: 1000;
+            transition: left 0.3s ease-in-out;
+        }
+
+
+        .toggle-btn:hover{
+            background-color: #002d7b;
+        }
+
+
+       
+        .logo-container {
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+
+        .history-chatbox{
+            background-color:rgb(255, 255, 255);
+            width:200;
+            height:100;
+        }
+    </style>
+</head>
+
+
+<body>
+    <!-- -->
+    <button class="toggle-btn" onclick="toggleSidebar()">Sidenav</button>
+
+
+    <a class="logout-btn" href="/logout">Logout</a>
+
+
+    <div class="sidebar" id="sidebar">
+        <nav class="col-md-3 col-lg-2 d-md-block bg-light sidebar p-3">
+            <div class="logo-container">
+                <img src="/images/bionicape.png" alt="Logo" class="img-fluid center" style="max-width: 80px;">
+            </div><br><br>
+            <h3 class="text-center" style="color: rgb(255, 255, 255); font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin-left: 5px;">List of users:</h3>
+            <ul class="nav flex-column" id="listOfUsers">
+               
+            </ul>
+            <form class="form">
+                <h3 style="color: rgb(255, 255, 255); font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin-left: 5px;">Create a Channel:</h3><br>
+                <input class="admin-input" type="text" name="channelName" id="channelName"
+                    placeholder="Enter name of channel" />
+                <button class="admin-btn" type="submit">Create</button>
+            </form>
+
+
+            <br><br>
+            <h3 class="text-center" style="color: rgb(255, 255, 255); font-weight: 700; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin-left: 5px;">List of your Channels:</h3>
+            <ul class="nav flex-column" id="renderList">
+               
+            </ul>
+           
+        </nav>
+
+
+        <main class="col-md-9 ms-sm-auto col-lg-10 px-md-4">
+            <h1>Welcome</h1>
+            <p>This is the main content area.</p>
+        </main>
+    </div>
+    <!-- -->
+
+
+    <div>
+        <h1 id= "currentChatBoxTitle">
+
+
+        </h1>
+        <div class ="history-chatbox">
+            <ul id="messages"></ul>
+        </div>
+        <form id="form" action="">
+          <input id="input" autocomplete="off" /><button>Send</button>
+        </form>
+    </div>
+
+
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <script>
+        var currentChannel;
+        var currentRecipientUser;
+        var mode='';
+        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
+        displayAllChannel();
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+
+            sidebar.classList.toggle('collapsed');
+
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
+            } else {
+                toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
+            }
+        }
+
+
+
+
+        const formEl = document.querySelector('.form');
+
+
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+
+
+            fetch('/api/channel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    displayAllChannel(); // Refresh the list of channels
+                })
+                .catch(err => console.log(err));
+        });
+
+
+        function displayAllChannel() {
+            fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
+                .then(res => res.json())
+                .then(channels => {
+                    const renderList = document.getElementById('renderList');
+                    renderList.innerHTML = ''; // Clear the current list
+
+
+                    if (channels && channels.length > 0) {
+                        channels.forEach(channel => {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = '#';
+                            a.setAttribute("onclick", "selectChannel(this)");
+                            li.setAttribute("id",channel.channelName +"_id")
+                            a.textContent = channel.channelName;
+                            li.appendChild(a);
+                            renderList.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.textContent = 'No channels found.';
+                        renderList.appendChild(li);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+        function displayAllUser()
+        {
+            fetch('api/user')
+                .then(res=> res.json())
+                .then(users=>{
+                    const renderUserList= document.getElementById('listOfUsers');
+                    renderUserList.innerHTML='';
+
+
+                    if(users && users.length>0)
+                    {
+                        users.forEach(user=>{
+                            let li=document.createElement('li');
+                            let a= document.createElement('a');
+                            a.href='#';
+                            a.setAttribute("onclick", "selectUser(this)");
+                            li.setAttribute("id", user.username + "_id")
+                            a.textContent=user.username;
+                            li.appendChild(a);
+                            renderUserList.appendChild(li);
+                        });
+                    }else
+                    {
+                        let li = document.createElement('li');
+                        li.textContent='No user found. ';
+                        renderUserList.appendChild(li);
+                    }
+                                   
+   
+                })
+            }
+        // Call displayAllChannel on loading page to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllChannel);
+        //call displayAllUser on loading page to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllUser);
+
+
+        const socket= io();
+ 
+         const form= document.getElementById('form');
+         const input= document.getElementById('input');
+         const messagesUL= document.getElementById('messages');
+
+
+
+
+        function constructChatMessageFromJson(data)
+        {
+            if(!data.visible )
+            {
+                return DELETED_MODERATOR_MESSAGE;
+            }
+            return data.username + ":"+data.msg;
+        }
+
+
+         function addChatMessageToChatBox(msg)//create li
+        {
+            const item =document.createElement('li');//creates the 'li' tag for each message sent
+             item.textContent=constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
+             messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul  
+             item.setAttribute("onclick", "deleteMessage(this)");
+             item.setAttribute("id", msg.messageId);
+             item.setAttribute("data-visibility", msg.visible);    
+        }
+         form.addEventListener('submit', (e)=>{
+             e.preventDefault();
+             if(input.value){
+                if(mode=="channel")
+                {
+                    socket.emit('channel message', input.value, currentChannel);
+                }
+                else{
+                    socket.emit('dms to user', input.value, currentRecipientUser);
+                }
+                 input.value = '';
+             }
+         });
+ 
+         socket.on('channel message', (msg, channelName)=> {
+            console.log(channelName);
+            if(channelName===currentChannel)
+            {
+             addChatMessageToChatBox(msg);
+             window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else{
+                //notification
+                console.log("notify",channelName);
+                const channelToNotify = document.getElementById(msg.channelName+"_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+         });
+         socket.on('dms to user', (msg, currentRecipient)=> {
+            console.log("I have received dm", msg, currentRecipient);
+            if(currentRecipient===currentRecipientUser)
+            {
+             addChatMessageToChatBox(msg);
+             window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else{
+                //notification
+                console.log("notify",currentRecipient);
+                const userToNotify = document.getElementById(msg.username+"_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+         });
+         function clearBox(elementID)
+        {
+            console.log(elementID);
+            let element = document.getElementById(elementID);
+            element.innerHTML = "";//get the tag and whatever is in between becomes empty
+           
+        }
+         function loadChatHistoryOfCurrentChannel() {
+            fetch("/api/channel/"+currentChannel)
+            .then((res)=> res.json())
+            .then((data)=>{
+                console.log(JSON.stringify(data))
+                //createListUserInChannel(data);
+                clearBox("messages");
+                data.messageIds.forEach(message=>{
+                     addChatMessageToChatBox(message);
+                })
+            })
+            .catch(console.error);
+        }
+        function loadChatHistoryOfCurrentRecipientUser()
+        {
+            fetch("/api/user/userDMs/"+currentRecipientUser)
+            .then ((res)=>res.json())
+            .then((data)=>{
+                console.log(JSON.stringify(data))
+                clearBox("messages");
+                data.userDMs.forEach(dms=>{
+                    if(dms.recipientUser==currentRecipientUser)
+                    {
+                        dms.messageIds.forEach(individualMessage=>{
+                            addChatMessageToChatBox(individualMessage);
+                        })
+                    }
+                   
+                })
+            })
+            .catch(console.error);
+        }
+
+
+        function selectChannel(element)
+        {
+            mode="channel";
+           const displayChannelName= document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentChannel=element.innerHTML;
+            displayChannelName.innerHTML=element.innerHTML;
+            loadChatHistoryOfCurrentChannel();
+        }
+       
+        function selectUser(element)
+        {
+            mode="dms";
+            const selectUsername=document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentRecipientUser=element.innerHTML;
+            selectUsername.innerHTML=element.innerHTML;
+            loadChatHistoryOfCurrentRecipientUser();
+
+
+        }
+        function deleteMessage(element)
+        {
+            let messageId=element.getAttribute("id");
+            let visible=element.getAttribute("data-visibility");
+            let visibleInBoolType = (visible === 'true');
+            console.log(!visibleInBoolType);
+            socket.emit('modify channel message', messageId, !visibleInBoolType);
+        }
+        socket.on('modify channel message', (message, visible)=> {
+            console.log(message);
+            const findMessage=document.getElementById(message.messageId);
+            const elementMessageVisibility=findMessage.getAttribute("data-visibility");
+            if(visible==elementMessageVisibility)
+            {
+              return;  
+            }
+           
+            findMessage.setAttribute("data-visibility", visible);
+            if(visible)
+            {
+                findMessage.innerHTML = constructChatMessageFromJson(message)
+               
+            }
+            else
+            {
+                findMessage.innerHTML = DELETED_MODERATOR_MESSAGE;
+            }
+                     
+             
+           
+     
+         });
+    </script>
+   
+   
+</body>
+
+
+</html>
+

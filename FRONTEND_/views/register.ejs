@@ -1,0 +1,68 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sign Up</title>
+    <link rel="icon" href="/images/favicon.ico"/>
+    <link rel="stylesheet" href="/styles/style.css">
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="form-container">
+        <a class="Home-Button" href="/index">Home</a>
+        <h2>Sign Up</h2>
+        <form action="/register" method="post">
+            <div class="form-group">
+                <label for="Username">Username: </label>
+                <input type="text" name="username" id="username" placeholder="Enter your username" required autocomplete="off">
+            </div>
+            <div class="form-group">
+                <label for="password">Password: </label>
+                <input type="password" name="password" id="password" placeholder="Enter Password" required>
+            </div>
+
+            <!-- Checkbox to determine if the user is an admin -->
+            <div class="form-group">
+                <label>
+                    <input type="checkbox" name="isAdminCheckbox" id="isAdminCheckbox"> Are you an admin?
+                </label>
+            </div>
+
+            <!-- this is going to be the fucntioanlity to check whether the person is an admin-->
+            <div class="form-group hidden" id="adminPassGroup">
+                <label for="admin_pass">Admin Password:</label>
+                <input type="admin_pass" name="admin_pass" id="admin_pass" placeholder="Admin Password"><!--not required if it is it will be recorded-->
+            </div>
+
+            <button type="submit" class="submit-btn"><a style="color: white" href="/login">Sign Up</a></button>
+            <p>Already have an account? <a href="/login">Log In</a></p>
+        </form>
+        
+    </div>
+    <script>
+        // JavaScript to show/hide the admin password field
+        const isAdminCheckbox = document.getElementById('isAdminCheckbox');
+        const adminPassGroup = document.getElementById('adminPassGroup');
+        const adminPassInput = document.getElementById('admin_pass');
+
+        isAdminCheckbox.addEventListener('change', function() {
+            if (this.checked) {
+                // If checkbox is checked, show the admin password field and make it required
+                adminPassGroup.classList.remove('hidden');
+                adminPassInput.setAttribute('required', true);
+            } else {
+                // If checkbox is unchecked, hide the admin password field and remove the required attribute
+                adminPassGroup.classList.add('hidden');
+                adminPassInput.removeAttribute('required');
+            }
+        });
+    </script>
+</body>
+</html>

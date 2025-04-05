@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar</title>
+    <link rel="icon" href="/images/favicon.ico" />
+    <!-- <link rel="stylesheet" href="style.css"> -->
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <!-- <script src="/scripts/dmScript.js"></script> -->
+    <link href="/styles/styleChatDm.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<style>
+    .form {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    .admin-input {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px; 
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    .admin-btn {
+        padding: 6px 12px;
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .admin-btn:hover {
+        background: #4a2cb5;
+    }
+
+
+    #inviteForm {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    #inputInvite {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    #invite {
+        padding: 6px 12px; 
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #invite:hover {
+        background: #4a2cb5;
+    }
+
+    #leaveChannelForm {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px; 
+        margin-left: 15px; 
+    }
+
+    #leaveChannel {
+        width: 100%; 
+        padding: 6px 12px;
+        font-size: 14px;
+        background-color: #e14b31;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #leaveChannel:hover {
+        background: #b5281a;
+    }
+
+
+    #log_out_btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    #log_out:hover {
+        color: red;
+    }
+</style>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <div class="main_logo">Bionic Ape <img src="/images/bionicape.png" alt="Logo" class="img-fluid center"
+                    style="max-width: 30px;"></div>
+            <i class='bx bx-menu' id="btn"></i>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <i class='bx bx-search'></i>
+                <form class="form">
+                    <input type="text" class="admin-input" type="text" name="channelName" id="channelName"
+                        placeholder="Create a Channel...">
+                    <span class="tooltip">CreateChannel</span><br><br>
+                    <button class="admin-btn" type="submit">Create</button>
+                </form>
+            </li>
+            <li>
+                <a href="/channelChatting">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="links_name">Channels</span>
+                </a>
+                <span class="tooltip">Channels</span>
+            </li>
+            <li>
+                <a href="/userDM">
+                    <i class='bx bx-user'></i>
+                    <span class="links_name">Users</span>
+                </a>
+                <span class="tooltip">Users</span>
+            </li>
+            <li>
+                <a href="">
+                    <i class='bx bx-cog'></i>
+                    <span class="links_name">Settings</span>
+                </a>
+                <span class="tooltip">Settings</span>
+            </li>
+            <li class="profile">
+                <div class="profile-details">
+                    <div class="name_job"><br>
+                        <div class="name"><%= username %></div>
+                    </div>
+                </div>
+                <form style="display: inline;" id="logoutForm";>
+                    <button type="submit" id="log_out_btn">
+                        <i class='bx bx-log-out' id="log_out"></i>
+                    </button>
+                </form>
+            </li>
+        </ul>
+    </div>
+
+    <section class="home-section">
+        <div class="text">Chat with Fellow APES</div>
+        <div class="containingALL">
+            <div class="containerDM">
+                <!-- User list -->
+                <ul class="nav flex-column col-md-3" id="renderList">
+                    <!-- Users will be added here dynamically -->
+                </ul>
+                <!-- Chatbox -->
+
+            </div>
+
+            <div>
+                <h1 id="currentChatBoxTitle"></h1>
+                <i id="lastActiveAtTitle"></i> <br><br>
+                <div class="history-chatbox">
+                    <ul id="messages"></ul>
+            </div></div>
+
+        </div><br>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" />
+            <% include('FRONTEND_/views/partials/emojiBox.ejs') %>
+            <button id="toes">Send</button>
+        </form>
+
+        <div class="waves">
+            <div class="wave wave1"></div>
+            <div class="wave wave2"></div>
+            <div class="wave wave3"></div>
+            <div class="wave wave4"></div>
+        </div>
+    </section>
+
+    <script>
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        let searchBtn = document.querySelector(".bx-search");
+        displayAllUser();
+
+        closeBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        searchBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        function menuBtnChange() {
+            if (sidebar.classList.contains("open")) {
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            } else {
+                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+            }
+        }
+
+        menuBtnChange();
+        var currentChannel;
+        var currentRecipientUser;
+        var mode = '';
+        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
+
+        function displayAllUser() {
+            fetch('api/user')
+                .then(res => res.json())
+                .then(users => {
+                    const renderUserList = document.getElementById('renderList');
+                    renderUserList.innerHTML = '';
+
+
+                    if (users && users.length > 0) {
+                        users.forEach(user => {
+                            let li = document.createElement('li');
+                            let a = document.createElement('a'); // For showing username
+                            let i = document.createElement('i'); // For showing userStatus
+
+                            a.href = '#';
+                            a.setAttribute("onclick", "selectUser(this)");
+                            li.setAttribute("id", user.username + "_id");
+
+                            // Check if userStatus exists, otherwise use a default value
+                            let userStatus = user.userStatus || "No Status"; // Default value if userStatus is missing
+                            if (userStatus == "online") {
+                                i.setAttribute("class", "userStatus_online");
+                            } else {
+                                i.setAttribute("class", "userStatus");
+                            }
+                            // Show username and userStatus
+                            a.textContent = user.username;
+                            i.textContent = userStatus;
+
+                            li.appendChild(a); li.appendChild(i);
+                            renderUserList.appendChild(li);
+                        });
+                    } else {
+                        let li = document.createElement('li');
+                        li.textContent = 'No user found.';
+                        renderUserList.appendChild(li);
+                    }
+
+
+                })
+        }
+
+        //call displayAllUser on loading page to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllUser);
+
+
+        const socket = io();
+
+        const form = document.getElementById('form');
+        const logoutForm = document.getElementById('logoutForm');
+
+        const input = document.getElementById('input');
+        const messagesUL = document.getElementById('messages');
+
+
+
+
+        function constructChatMessageFromJson(data) {
+            if (!data.visible) {
+                return DELETED_MODERATOR_MESSAGE;
+            }
+            return data.username + ":" + data.msg;
+        }
+
+
+        function addChatMessageToChatBox(msg)//create li
+        {
+            const item = document.createElement('li');//creates the 'li' tag for each message sent
+            item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
+            messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul  
+            item.setAttribute("onclick", "deleteMessage(this)");
+            item.setAttribute("id", msg.messageId);
+            item.setAttribute("data-visibility", msg.visible);
+        }
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                if (mode == "channel") {
+                    socket.emit('channel message', input.value, currentChannel);
+                }
+                else {
+                    socket.emit('dms to user', input.value, currentRecipientUser);
+                }
+                input.value = '';
+            }
+        });
+
+        logoutForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            socket.emit('log out');
+            window.location.href = "/logout"
+        });
+
+        socket.on('channel message', (msg, channelName) => {
+            console.log(channelName);
+            if (channelName === currentChannel) {
+                addChatMessageToChatBox(msg);
+                window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else {
+                //notification
+                console.log("notify", channelName);
+                const channelToNotify = document.getElementById(msg.channelName + "_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+        });
+
+        
+        socket.on('dms to user', (msg, currentRecipient) => {
+            console.log("I have received dm", msg, currentRecipient);
+            if (currentRecipient === currentRecipientUser) {
+                addChatMessageToChatBox(msg);
+                window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else {
+                //notification
+                console.log("notify", currentRecipient);
+                const userToNotify = document.getElementById(msg.username + "_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+        });
+
+        socket.on('user status',  (currentRecipient)=>{
+            const liUserNameToUpdate = document.getElementById(currentRecipient.username + "_id");
+            
+            let i = liUserNameToUpdate.getElementsByTagName('i');
+
+            
+            // Check if userStatus exists, otherwise use a default value
+            
+            if (currentRecipient.userStatus == "online") {
+                 i[0].setAttribute("class", "userStatus_online");
+            } else {
+                  i[0].setAttribute("class", "userStatus");
+            }
+            i[0].textContent = currentRecipient.userStatus;
+            console.log("the recipient's status has changed", currentRecipient);
+        
+        }); 
+
+        
+        function clearBox(elementID) {
+            console.log(elementID);
+            let element = document.getElementById(elementID);
+            element.innerHTML = "";//get the tag and whatever is in between becomes empty
+
+        }
+        function loadChatHistoryOfCurrentChannel() {
+            fetch("/api/channel/" + currentChannel)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(JSON.stringify(data))
+                    //createListUserInChannel(data);
+                    clearBox("messages");
+                    data.messageIds.forEach(message => {
+                        addChatMessageToChatBox(message);
+                    })
+                })
+                .catch(console.error);
+        }
+        function loadChatHistoryOfCurrentRecipientUser() {
+            fetch("/api/user/userDMs/" + currentRecipientUser)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(JSON.stringify(data))
+                    clearBox("messages");
+                    clearBox("lastActiveAtTitle");
+                    data.userDMs.forEach(dms => {
+                        if (dms.recipientUser == currentRecipientUser) {
+                            // Show message history
+                            dms.messageIds.forEach(individualMessage => {
+                                addChatMessageToChatBox(individualMessage);
+                            })
+                            // Show last active time
+                            const lastActiveAt = document.getElementById("lastActiveAtTitle");
+                            fetch("/api/user/getuser/" + currentRecipientUser)
+                                .then((res) => res.json())
+                                .then((data) => {
+                                    console.log(JSON.stringify(data))
+                                    const activeDate = new Date(data.lastActivateAt);
+                                    lastActiveAt.innerHTML = "Last active on " + activeDate.toDateString() + " at " + activeDate.toLocaleTimeString();
+                                    return data;
+                                })
+                                .catch(console.error);
+                        }
+                    })
+                })
+                .catch(console.error);
+        }
+
+
+        function selectChannel(element) {
+            mode = "channel";
+            const displayChannelName = document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentChannel = element.innerHTML;
+            displayChannelName.innerHTML = element.innerHTML;
+            loadChatHistoryOfCurrentChannel();
+        }
+
+        function selectUser(element) {
+            mode = "dms";
+            const selectUsername = document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentRecipientUser = element.innerHTML;
+            selectUsername.innerHTML = element.innerHTML;
+            loadChatHistoryOfCurrentRecipientUser();
+        }
+
+        function deleteMessage(element) {
+            let messageId = element.getAttribute("id");
+            let visible = element.getAttribute("data-visibility");
+            let visibleInBoolType = (visible === 'true');
+            console.log(!visibleInBoolType);
+            socket.emit('modify channel message', messageId, !visibleInBoolType);
+        }
+        socket.on('modify channel message', (message, visible) => {
+            console.log(message);
+            const findMessage = document.getElementById(message.messageId);
+            const elementMessageVisibility = findMessage.getAttribute("data-visibility");
+            if (visible == elementMessageVisibility) {
+                return;
+            }
+
+            findMessage.setAttribute("data-visibility", visible);
+            if (visible) {
+                findMessage.innerHTML = constructChatMessageFromJson(message)
+
+            }
+            else {
+                findMessage.innerHTML = DELETED_MODERATOR_MESSAGE;
+            }
+
+
+
+
+        });
+    </script>
+
+</body>
+
+</html>

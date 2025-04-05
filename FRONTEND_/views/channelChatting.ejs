@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sidebar</title>
+    <link rel="icon" href="/images/favicon.ico" />
+    <!-- <link rel="stylesheet" href="styles.css"> -->
+    <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
+    <!-- <script src="/scripts/chatScript.js"></script> -->
+    <link href="/styles/styleChatDm.css" rel="stylesheet">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+
+<style>
+    .form {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    .admin-input {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px; 
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    .admin-btn {
+        padding: 6px 12px;
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .admin-btn:hover {
+        background: #4a2cb5;
+    }
+
+
+    #inviteForm {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px;
+        margin-left: 15px; 
+    }
+
+    #inputInvite {
+        flex: 1; 
+        padding: 6px;
+        border: 1px solid #ddd;
+        border-radius: 6px;
+        font-size: 14px;
+        margin-right: 5px; 
+        width: 180px;
+    }
+
+    #invite {
+        padding: 6px 12px; 
+        font-size: 14px; 
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #invite:hover {
+        background: #4a2cb5;
+    }
+
+    #leaveChannelForm {
+        display: flex;
+        flex-direction: row; 
+        align-items: center;
+        background: none; 
+        padding: 0; 
+        max-width: 300px; 
+        margin-left: 15px; 
+    }
+
+    #leaveChannel {
+        width: 100%; 
+        padding: 6px 12px;
+        font-size: 14px;
+        background-color: #e14b31;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    #leaveChannel:hover {
+        background: #b5281a;
+    }
+
+
+    #log_out_btn {
+        background: none;
+        border: none;
+        cursor: pointer;
+        padding: 0;
+    }
+
+    #log_out:hover {
+        color: red;
+    }
+</style>
+
+<body>
+    <div class="sidebar">
+        <div class="logo-details">
+            <div class="main_logo">Bionic Ape <img src="/images/bionicape.png" alt="Logo" class="img-fluid center"
+                    style="max-width: 30px;"></div>
+            <i class='bx bx-menu' id="btn"></i>
+        </div>
+        <ul class="nav-list">
+            <li>
+                <i class='bx bx-search'></i>
+                <form class="form">
+                    <input type="text" class="admin-input" type="text" name="channelName" id="channelName"
+                        placeholder="Create a Channel...">
+                    <span class="tooltip">CreateChannel</span><br><br>
+                    <button class="admin-btn" type="submit">Create</button>
+                </form>
+            </li>
+            <li>
+                <a href="/channelChatting">
+                    <i class='bx bx-grid-alt'></i>
+                    <span class="links_name">Channels</span>
+                </a>
+                <span class="tooltip">Channels</span>
+            </li>
+            <li>
+                <a href="/userDM">
+                    <i class='bx bx-user'></i>
+                    <span class="links_name">Users</span>
+                </a>
+                <span class="tooltip">Users</span>
+            </li>
+            <li>
+                <a href="">
+                    <i class='bx bx-cog'></i>
+                    <span class="links_name">Settings</span>
+                </a>
+                <span class="tooltip">Settings</span>
+            </li>
+            <li class="profile">
+                <div class="profile-details">
+                    <div class="name_job"><br>
+                        <div class="name"> <%= username %> </div>
+                    </div>
+                </div>
+                <form action="/logout" method="GET" style="display: inline;">
+                    <button type="submit" id="log_out_btn">
+                        <i class='bx bx-log-out' id="log_out"></i>
+                    </button>
+                </form>
+            </li>
+            <% if (username === "admin") { %>
+                <li>
+                    <a href="/adminPage" class="sidebar-btn">
+                        <i class='bx bx-arrow-back'></i>
+                        <span class="links_name">Back to Admin</span>
+                    </a>
+                    <span class="tooltip">Admin Page</span>
+                </li>
+            <% } %>
+            
+        </ul>
+    </div>
+
+
+
+
+    <section class="home-section">
+        <div class="text">Channel Chatting</div><br><br>
+        <p style="font-size: 24px; font-weight: bold; margin-left: 15px;">Available Channels</p>
+        <div class="containingALL">
+            <div class="containerDM">
+                <!-- Channel list -->
+                <ul class="nav flex-column col-md-3" id="renderList">
+                    <!-- Channels will be added here dynamically -->
+                </ul>
+
+            </div>
+            <br>
+            <div><h1 id="currentChatBoxTitle"></h1>
+                <div class="history-chatbox">
+                    <ul id="messages"></ul>
+            </div></div>
+        </div>
+        <br>
+        <form id="form" action="">
+            <input id="input" autocomplete="off" />
+            <button id="toes">Send</button>
+        </form>
+
+        <form id="inviteForm" action="" style="display: none;">
+            <h3 style="margin-left: 5px;">Invite Apes to Channel:</h3><br>
+            <input id="inputInvite" autocomplete="off" />
+            <button id="invite">INVITE</button>
+        </form>
+        
+        <form id="leaveChannelForm" action="" style="display: none;">
+            <button id="leaveChannel">Remove</button>
+
+        </form>
+        <div class="waves">
+            <div class="wave wave1"></div>
+            <div class="wave wave2"></div>
+            <div class="wave wave3"></div>
+            <div class="wave wave4"></div>
+        </div>
+    </section>
+    
+
+
+    <script>
+        const socket = io();
+
+        const form = document.getElementById('form');
+        const input = document.getElementById('input');
+        const messagesUL = document.getElementById('messages');
+        const inviteForm = document.getElementById('inviteForm');
+        const inputInvite = document.getElementById('inputInvite');
+        const leaveChannelForm = document.getElementById('leaveChannelForm');
+
+
+
+        function constructChatMessageFromJson(data) {
+            if (!data.visible) {
+                return DELETED_MODERATOR_MESSAGE;
+            }
+            return data.username + ":" + data.msg;
+        }
+
+
+        function addChatMessageToChatBox(msg)//create li
+        {
+            const item = document.createElement('li');//creates the 'li' tag for each message sent
+            item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
+            messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul  
+            item.setAttribute("onclick", "deleteMessage(this)");
+            item.setAttribute("id", msg.messageId);
+            item.setAttribute("data-visibility", msg.visible);
+        }
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (input.value) {
+                if (mode == "channel") {
+                    socket.emit('channel message', input.value, currentChannel);
+                }
+                else {
+                    socket.emit('dms to user', input.value, currentRecipientUser);
+                }
+                input.value = '';
+            }
+        });
+        inviteForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (inputInvite.value) {
+                if (mode == "channel") {
+                    socket.emit('channel invite', inputInvite.value, currentChannel);
+                }
+                inputInvite.value = '';
+            }
+        });
+        leaveChannelForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            if (mode == "channel") {
+                socket.emit('channel leave', currentChannel);
+            }
+        });
+        socket.on('channel message', (msg, channelName) => {
+            console.log(channelName);
+            if (channelName === currentChannel) {
+                addChatMessageToChatBox(msg);
+                window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else {
+                //notification
+                console.log("notify", channelName);
+                const channelToNotify = document.getElementById(msg.channelName + "_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+        });
+        socket.on('channel invite', (channel, userExist) => {
+            if (!userExist) {
+                alert("User does not exist");
+            }
+            else {
+                alert(JSON.stringify(channel));
+
+            }
+        })
+        socket.on('channel leave', (userLeft) => {
+            if (userLeft) {
+                alert("User left");
+                location.reload();//refresh the page to make leaving channel dissapear
+            }
+            else {
+                alert("User fail to leave");
+            }
+
+        })
+        socket.on('dms to user', (msg, currentRecipient) => {
+            console.log("I have received dm", msg, currentRecipient);
+            if (currentRecipient === currentRecipientUser) {
+                addChatMessageToChatBox(msg);
+                window.scrollTo(0, document.body.scrollHeight);//some scrolling
+            }
+            else {
+                //notification
+                console.log("notify", currentRecipient);
+                const userToNotify = document.getElementById(msg.username + "_id");
+                //channelToNotify.setAttribute("class","sidebarNotify");
+                //channelToNotify.style.backgroundColor = "red"
+            }
+        });
+        function clearBox(elementID) {
+            console.log(elementID);
+            let element = document.getElementById(elementID);
+            element.innerHTML = "";//get the tag and whatever is in between becomes empty
+
+        }
+        function loadChatHistoryOfCurrentChannel() {
+            fetch("/api/channel/" + currentChannel)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(JSON.stringify(data))
+                    //createListUserInChannel(data);
+                    clearBox("messages");
+                    data.messageIds.forEach(message => {
+                        addChatMessageToChatBox(message);
+                    })
+                    if (data.public == undefined || data.public == true) {
+                        inviteForm.style.display = 'none';
+                        leaveChannelForm.style.display = 'none';
+
+                    }
+                    else {
+                        inviteForm.style.display = 'inline-block';
+                        leaveChannelForm.style.display = 'inline-block';
+                    }
+                    //mongodb is not very restrictive so the schema can differ.
+                    //no sql is flexible in terms of schema therefore, we need to mention both statement wheter the data is undefined and true
+                })
+                .catch(console.error);
+        }
+        function loadChatHistoryOfCurrentRecipientUser() {
+            fetch("/api/user/userDMs/" + currentRecipientUser)
+                .then((res) => res.json())
+                .then((data) => {
+                    console.log(JSON.stringify(data))
+                    clearBox("messages");
+                    data.userDMs.forEach(dms => {
+                        if (dms.recipientUser == currentRecipientUser) {
+                            dms.messageIds.forEach(individualMessage => {
+                                addChatMessageToChatBox(individualMessage);
+                            })
+                        }
+
+                    })
+                })
+                .catch(console.error);
+        }
+
+
+        function selectChannel(element) {
+            mode = "channel";
+            const displayChannelName = document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentChannel = element.innerHTML;
+            displayChannelName.innerHTML = element.innerHTML;
+            loadChatHistoryOfCurrentChannel();
+        }
+
+        function selectUser(element) {
+            mode = "dms";
+            const selectUsername = document.getElementById("currentChatBoxTitle");
+            console.log(element.innerHTML);
+            currentRecipientUser = element.innerHTML;
+            selectUsername.innerHTML = element.innerHTML;
+            loadChatHistoryOfCurrentRecipientUser();
+        }
+
+        function deleteMessage(element) {
+            let messageId = element.getAttribute("id");
+            let visible = element.getAttribute("data-visibility");
+            let visibleInBoolType = (visible === 'true');
+            console.log(!visibleInBoolType);
+            socket.emit('modify channel message', messageId, !visibleInBoolType);
+        }
+        socket.on('modify channel message', (message, visible) => {
+            console.log(message);
+            const findMessage = document.getElementById(message.messageId);
+            const elementMessageVisibility = findMessage.getAttribute("data-visibility");
+            if (visible == elementMessageVisibility) {
+                return;
+            }
+
+            findMessage.setAttribute("data-visibility", visible);
+            if (visible) {
+                findMessage.innerHTML = constructChatMessageFromJson(message)
+
+            }
+            else {
+                findMessage.innerHTML = DELETED_MODERATOR_MESSAGE;
+            }
+
+
+
+
+        });
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        let searchBtn = document.querySelector(".bx-search");
+
+        closeBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        searchBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        function menuBtnChange() {
+            if (sidebar.classList.contains("open")) {
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            } else {
+                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+            }
+        }
+
+        menuBtnChange();
+        displayAllChannel();
+
+        var currentChannel;
+
+        var currentRecipientUser;
+        var mode = '';
+        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+
+            sidebar.classList.toggle('collapsed');
+
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
+            } else {
+                toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
+            }
+        }
+
+
+
+
+        const formEl = document.querySelector('.form');
+
+
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+
+
+            fetch('/api/channel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    displayAllChannel(); // Refresh the list of channels
+                })
+                .catch(err => console.log(err));
+        });
+
+
+        function displayAllChannel() {
+            fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
+                .then(res => res.json())
+                .then(channels => {
+                    const renderList = document.getElementById('renderList');
+                    renderList.innerHTML = ''; // Clear the current list
+
+
+                    if (channels && channels.length > 0) {
+                        channels.forEach(channel => {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = '#';
+                            a.setAttribute("onclick", "selectChannel(this)");
+                            li.setAttribute("id", channel.channelName + "_id")
+                            a.textContent = channel.channelName;
+                            li.appendChild(a);
+                            renderList.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.textContent = 'No channels found.';
+                        renderList.appendChild(li);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+
+        // Call displayAllChannel on loading page to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllChannel);
+
+
+    </script>
+
+</body>
+
+</html>
