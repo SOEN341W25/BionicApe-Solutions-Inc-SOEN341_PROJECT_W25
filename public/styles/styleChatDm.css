@@ -59,6 +59,21 @@
   bottom: 20px;
 }
 
+.positive {
+  background-color: #d4edda;
+  border-left: 5px solid #28a745;
+}
+
+.neutral {
+  background-color: #f8f9fa;
+  border-left: 5px solid #6c757d;
+}
+
+.negative {
+  background-color: #f8d7da;
+  border-left: 5px solid #dc3545;
+}
+
 @keyframes animate {
   0% {
     background-position-x: 0;

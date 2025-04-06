@@ -25,6 +25,13 @@ function addChatMessageToChatBox(msg)//create li
     item.setAttribute("onclick", "deleteMessage(this)");
     item.setAttribute("id", msg.messageId);
     item.setAttribute("data-visibility", msg.visible);
+    if (msg.sentiment === 'positive') {
+        item.classList.add('positive');
+    } else if (msg.sentiment === 'negative') {
+        item.classList.add('negative');
+    } else {
+        item.classList.add('neutral');
+    }    
 }
 form.addEventListener('submit', (e) => {
     e.preventDefault();

@@ -10,13 +10,14 @@ const { createServer }= require('node:http');
 const { join }=require('node:path');
 const { Server }= require('socket.io');
 
-
 require('./BACKEND_/database/db');   
 const User = require("./BACKEND_/model/User");
 const Channel = require("./BACKEND_/model/Channel");
 const Message = require("./BACKEND_/model/Message");
 const Counters = require("./BACKEND_/model/Counters");
 const mongoose = require('mongoose')
+const Sentiment = require('sentiment');
+const sentiment = new Sentiment();
 const { sessionMiddleware, wrap }=require("./BACKEND_/session/serverController");
 //const bcrypt = require("bcrypt");
 //============================
@@ -518,19 +519,33 @@ io.on('connection',  async function(socket){
 
   socket.on('channel message', async (msg, channelName)=>{
     let userName=socket.request.session.user;
+
+    const result = sentiment.analyze(msg);
+    const sentimentLabel = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
+
     let newMessage= await saveChannelMessageInDatabase(msg, userName, channelName);
-      io.emit('channel message',newMessage, channelName);//backend will rebroadcast it to everyone 
-      console.log("sending msg! ",JSON.stringify(newMessage))
+    newMessage = newMessage.toObject();
+    newMessage.sentiment = sentimentLabel;
+    io.emit('channel message',newMessage, channelName);//backend will rebroadcast it to everyone 
+    console.log("sending msg! ",JSON.stringify(newMessage))
   });
  
 
   socket.on('dms to user', async (msg, currentRecipientUser)=>{
     let userName=socket.request.session.user;
+
+    const result = sentiment.analyze(msg);
+    const sentimentLabel = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
+
     const senderSocketId=usersocketmap[userName];
     const recipientSocketId=usersocketmap[currentRecipientUser];
     console.log(senderSocketId);
     console.log(recipientSocketId);
     let newMessage= await saveDmToDatabase(userName, currentRecipientUser, msg);
+
+    newMessage = newMessage.toObject();
+    newMessage.sentiment = sentimentLabel;
+
     if(senderSocketId)
     {
         io.to(senderSocketId).emit('dms to user', newMessage, currentRecipientUser);//only rebroadcast to the user that was dm
