@@ -472,22 +472,29 @@
   border: 1px solid #ddd;
   border-radius: 4px 0 0 4px;
   display: block;
-  margin-left: 425px;
+  margin-left: 400px;
 }
 
 
-#form button {
+/* #form button {
+  padding: 8px 16px;
+  background-color: #957fec;
+  color: white;
+  border: none;
+  border-radius: 0 4px 4px 0;
+  cursor: pointer;
+} */
+
+#toes {
+  margin-left: 0px;
+  margin-right: 200px;
+
   padding: 8px 16px;
   background-color: #5d3fd3;
   color: white;
   border: none;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
-}
-
-#toes {
-  margin-left: 0px;
-  margin-right: 200px;
 }
 
 .admin-btn {
@@ -580,16 +587,31 @@
 
 #emoji-box {
   position: absolute;
-  background: white;
+  background: #babbff;
   border: 1px solid #ccc;
+  color: white;
+  font-weight: bold;
   padding: 10px;
   display: none;
   max-height: 144px;
   overflow-y: scroll;
+  margin-top: 32px;
+  margin-left: 820px;
+  border-radius: 4px 4px 4px 4px;
+  scrollbar-color: #babbff #f1f1f1;
+  scrollbar-width: thin;
 }
 
 .emoji {
   cursor: pointer;
   font-size: 20px;
   margin: 5px;
+}
+
+#emoji-button {
+  padding: 8px 9px;
+  background-color: #babbff;
+  color: white;
+  border: none;
+  cursor: pointer;
 }

@@ -1,8 +1,8 @@
-<input type="text" id="emoji-input" placeholder="Choose an emoji...">
-<button id="emoji-button">🦍</button>
+<!-- <input type="text" id="emoji-input" placeholder="Choose an emoji..."> -->
+<button id="emoji-button" type="button">🦍</button>
 
 <div id="emoji-box" style="display: none;">
-    Bionic Emojis
+    <!-- Bionic Emojis -->
     <table>
         <tr>
             <td class="emoji" data-emoji="😀">😀</td>
@@ -80,3 +80,20 @@
     </table>
 
 </div>
+
+<script>
+    const emojiButton = document.getElementById('emoji-button');
+    const emojiBox = document.getElementById('emoji-box');
+    const emojiInput = document.getElementById('input');
+
+    emojiButton.addEventListener('click', () => {
+        emojiBox.style.display = emojiBox.style.display === 'block' ? 'none' : 'block';
+    });
+
+    emojiBox.addEventListener('click', (e) => {
+        if (e.target.classList.contains('emoji')) {
+            emojiInput.value += e.target.getAttribute('data-emoji');
+            emojiBox.style.display = 'none';
+        }
+    });
+</script>
