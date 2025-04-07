@@ -1,29 +1,31 @@
-// Filename - model/Channel.js
-//create channel
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-var Channel = new Schema({//fieldtype: variable type
+const channelSchema = new Schema({
     channelName: {
-        type: String
+        type: String,
+        required: true,
+        unique: true
     },
-    messageIds: [
-    {type: mongoose.Schema.Types.ObjectId, ref:'Message'}	
-    ],
+    messageIds: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Message'
+    }],
     users: {
-        type:[String]
+        type: [String],
+        default: []
     },
     public: {
-        type: Boolean, default:true
+        type: Boolean,
+        default: true
     }
-})
+});
 
-
-Channel.methods.toJSON= function(){
-    var obj=this.toObject();
+// Remove _id when transforming to JSON
+channelSchema.methods.toJSON = function() {
+    const obj = this.toObject();
     delete obj._id;
     return obj;
-}
+};
 
-//this is a mongodb collection
-module.exports = mongoose.model('channels', Channel)
+module.exports = mongoose.model('channels', channelSchema);
