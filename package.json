@@ -48,3 +48,10 @@
     ]
   }
 }
+"scripts": {
+  "test": "jest",
+  "test:unit": "jest --config=jest.unit.config.js",
+  "test:integration": "jest --config=jest.integration.config.js",
+  "test:acceptance": "jest --config=jest.acceptance.config.js",
+  "test:all": "npm run test:unit && npm run test:integration && npm run test:acceptance"
+}
