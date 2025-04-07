@@ -26,11 +26,10 @@ describe('User API', () => {
     });
 
     test('Get all users', async () => {
-        await app.get('/api/user', function(req, res) { //const res = 
-            expect(res.status).toBe(200);
-            expect(Array.isArray(res.body)).toBe(true);
-        });
-    });
+    const res = await request(app).get('/api/user');
+    expect(res.status).toBe(200);
+    expect(Array.isArray(res.body)).toBe(true);
+});
 
     test('Get user by username', async () => {
         app.get('/api/user/getuser/testuser', function(req, res) {
