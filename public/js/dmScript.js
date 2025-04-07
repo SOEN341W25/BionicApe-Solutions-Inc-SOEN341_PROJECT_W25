@@ -108,4 +108,74 @@ function displayAllUsers() {
                 users.forEach(user => {
                     const li = document.createElement('li');
                     const a = document.createElement('a');
-                    const i = document.createElement('
+                    const i = document.createElement('i');
+                    
+                    a.href = '#';
+                    a.setAttribute("onclick", "selectUser(this)");
+                    li.setAttribute("id", `${user.username}_id`);
+                    
+                    // Set user status indicator
+                    const userStatus = user.userStatus || "offline";
+                    i.setAttribute("class", userStatus === "online" ? "userStatus_online" : "userStatus");
+                    
+                    // Set content
+                    a.textContent = user.username;
+                    i.textContent = userStatus;
+                    
+                    li.appendChild(a);
+                    li.appendChild(i);
+                    renderUserList.appendChild(li);
+                });
+            } else {
+                const li = document.createElement('li');
+                li.textContent = 'No users found.';
+                renderUserList.appendChild(li);
+            }
+        })
+        .catch(error => {
+            console.error("Error loading users:", error);
+        });
+}
+
+// Event listeners
+form.addEventListener('submit', (e) => {
+    e.preventDefault();
+    if (input.value && currentRecipientUser) {
+        socket.emit('dms to user', input.value, currentRecipientUser);
+        input.value = '';
+    }
+});
+
+closeBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    menuBtnChange();
+});
+
+searchBtn.addEventListener("click", () => {
+    sidebar.classList.toggle("open");
+    menuBtnChange();
+});
+
+// Socket event listeners
+socket.on('dms to user', (msg, sender) => {
+    if (sender === currentRecipientUser || msg.username === currentRecipientUser) {
+        addChatMessageToChatBox(msg);
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+});
+
+socket.on('user status', (user) => {
+    const userElement = document.getElementById(`${user.username}_id`);
+    if (userElement) {
+        const statusElement = userElement.querySelector('i');
+        if (statusElement) {
+            statusElement.setAttribute("class", user.userStatus === "online" ? "userStatus_online" : "userStatus");
+            statusElement.textContent = user.userStatus;
+        }
+    }
+});
+
+// Initialize
+menuBtnChange();
+displayAllUsers();
+document.addEventListener('DOMContentLoaded', displayAllUsers);
