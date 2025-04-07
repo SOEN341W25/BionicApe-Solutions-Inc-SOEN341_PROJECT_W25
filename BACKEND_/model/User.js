@@ -1,46 +1,52 @@
-// Filename - model/User.js
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-
-var User = new Schema({
+const userSchema = new Schema({
     username: {
-        type: String
+        type: String,
+        required: true,
+        unique: true
     },
     password: {
-        type: String
+        type: String,
+        required: true
     },
-    role:{
-        type:String
+    role: {
+        type: String,
+        enum: ['Admin', 'NormalUser'],
+        default: 'NormalUser'
     },
     channels: {
-        type:[String]
+        type: [String],
+        default: []
     },
     userDMs: [{
-    	recipientUser: {
-    		type:String
-    	},
-    	messageIds:[{
-    		type: mongoose.Schema.Types.ObjectId,
-    		ref: 'Message' //Reference to the Message model
-    		}]
-    	}],
-    userStatus:{
-        type: String
+        recipientUser: {
+            type: String,
+            required: true
+        },
+        messageIds: [{
+            type: mongoose.Schema.Types.ObjectId,
+            ref: 'Message'
+        }]
+    }],
+    userStatus: {
+        type: String,
+        enum: ['online', 'offline', 'away'],
+        default: 'offline'
     },
     lastActivateAt: {
-        type: Date  
+        type: Date,
+        default: Date.now
     }
- })
+});
 
-//remove password when transforming to JSON. Don't want to send back to clients with password
-User.methods.toJSON= function(){
-    var obj=this.toObject();
+// Remove password when transforming to JSON
+userSchema.methods.toJSON = function() {
+    const obj = this.toObject();
     delete obj.password;
     delete obj._id;
     return obj;
-}
+};
 
-//this is mongodb collection
-module.exports = mongoose.model('users', User)
-    
+module.exports = mongoose.model('users', userSchema);
