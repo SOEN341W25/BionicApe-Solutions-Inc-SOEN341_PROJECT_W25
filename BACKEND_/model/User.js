@@ -34,7 +34,7 @@ var User = new Schema({
  })
 
 //remove password when transforming to JSON. Don't want to send back to clients with password
-User.method.toJSON= function(){
+User.methods.toJSON= function(){
     var obj=this.toObject();
     delete obj.password;
     delete obj._id;
