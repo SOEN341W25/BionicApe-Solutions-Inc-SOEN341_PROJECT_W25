@@ -23,7 +23,6 @@ Channel.methods.toJSON= function(){
     var obj=this.toObject();
     delete obj._id;
     return obj;
-
 }
 
 //this is a mongodb collection
