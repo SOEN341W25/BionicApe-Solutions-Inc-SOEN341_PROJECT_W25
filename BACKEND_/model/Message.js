@@ -1,22 +1,32 @@
-// Filename - model/Message.js
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-
-var Message = new Schema({
+const messageSchema = new Schema({
     messageId: {
-        type:Number, default:0
+        type: Number,
+        default: 0
     },
     msg: {
-        type: String
+        type: String,
+        required: true
     },
     visible: {
-        type:Boolean, default:true
+        type: Boolean,
+        default: true
     },
-    username:{
-        type: String
+    username: {
+        type: String,
+        required: true
+    },
+    sentiment: {
+        type: String,
+        enum: ['positive', 'negative', 'neutral'],
+        default: 'neutral'
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     }
-})
+});
 
-
-module.exports = mongoose.model('Message', Message)
+module.exports = mongoose.model('Message', messageSchema);
