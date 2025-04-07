@@ -1,16 +1,15 @@
-// Filename - model/Counters.js
+const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const mongoose = require('mongoose')
-const Schema = mongoose.Schema
-
-var Counters = new Schema({
+const countersSchema = new Schema({
     _id: {
-        type:String
+        type: String,
+        required: true
     },
     seq: {
-        type:Number, default:0
+        type: Number,
+        default: 0
     }
-})
+});
 
-
-module.exports = mongoose.model('Counters', Counters)
+module.exports = mongoose.model('Counters', countersSchema);
