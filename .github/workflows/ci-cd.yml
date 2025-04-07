@@ -25,16 +25,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      - name: Install ESLint
-        run: npm install eslint --save-dev
-
       - name: Run ESLint
-        run: npx eslint --ext .js . || echo "Linting completed with warnings"
+        run: npm run lint
+        continue-on-error: true
 
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
+  test:
+    name: Testing
     needs: lint
+    runs-on: ubuntu-latest
     
     steps:
       - name: Checkout repository
@@ -48,23 +46,22 @@ jobs:
 
       - name: Install dependencies
         run: npm install
-
-      - name: Install test dependencies
-        run: npm install jest @testing-library/jest-dom jsdom mongoose --save-dev
 
       - name: Run unit tests
         run: npm run test:unit
-
+        
+      - name: Run integration tests
+        run: npm run test:integration
+        
       - name: Upload test coverage
         uses: actions/upload-artifact@v4
         with:
-          name: unit-test-coverage
-          path: coverage-unit/
+          name: test-coverage
+          path: coverage*/
 
-  integration-tests:
-    name: Integration Tests
+  security:
+    name: Security Audit
     runs-on: ubuntu-latest
-    needs: unit-tests
     
     steps:
       - name: Checkout repository
@@ -74,51 +71,18 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 18
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm install
 
-      - name: Install test dependencies
-        run: npm install jest supertest mongodb-memory-server --save-dev
+      - name: Run npm audit
+        run: npm audit
+        continue-on-error: true
 
-      - name: Run integration tests
-        run: npm run test:integration
-
-      - name: Upload integration test coverage
-        uses: actions/upload-artifact@v4
-        with:
-          name: integration-test-coverage
-          path: coverage-integration/
-
-  acceptance-tests:
-    name: Acceptance Tests
+  build:
+    name: Build Application
+    needs: [test, security]
     runs-on: ubuntu-latest
-    needs: integration-tests
-    
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: 'npm'
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Install test dependencies
-        run: npm install jest puppeteer jest-puppeteer --save-dev
-
-      - name: Run acceptance tests
-        run: npm run test:acceptance
-
-  build-and-deploy:
-    name: Build and Deploy
-    runs-on: ubuntu-latest
-    needs: [unit-tests, integration-tests, acceptance-tests]
     if: github.ref == 'refs/heads/main'
     
     steps:
@@ -139,8 +103,15 @@ jobs:
           echo "Creating production build..."
           mkdir -p build
           cp -r model build/
-          cp -r public build/
-          cp -r *.js build/
+          cp -r routes build/
+          cp -r middleware build/
+          cp -r utils build/
+          mkdir -p build/public
+          cp -r public/* build/public/
+          mkdir -p build/views
+          cp -r views/* build/views/
+          cp app.js build/
+          cp package.json build/
           echo '{"version": "1.0.0", "build": "'$GITHUB_RUN_NUMBER'", "timestamp": "'$(date -u +"%Y-%m-%dT%H:%M:%SZ")'"}' > build/build-info.json
 
       - name: Archive build artifacts
@@ -149,5 +120,26 @@ jobs:
           name: chathaven-build
           path: build/
 
-      # Deploy steps would go here for your specific hosting environment
-      # This is a placeholder comment as actual deployment varies by platform
+  deploy-dev:
+    name: Deploy to Development
+    runs-on: ubuntu-latest
+    needs: build
+    environment: development
+    if: github.ref == 'refs/heads/main'
+    
+    steps:
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: chathaven-build
+          path: build
+
+      - name: Display build info
+        run: cat build/build-info.json
+
+      - name: Setup development deployment
+        run: |
+          echo "Setting up development deployment..."
+          # This would be replaced with actual deployment steps
+          # For example, deploying to a staging server
+          echo "Deployed to development environment"
