@@ -6,46 +6,46 @@ const { isLoggedIn, isAdmin } = require('../middleware/auth');
 
 // Home page
 router.get('/', (req, res) => {
-    res.render('index');
+    res.render('../FRONTEND_/views/index');
 });
 
 router.get('/index', (req, res) => {
-    res.render('index');
+    res.render('../FRONTEND_/views/index');
 });
 
 // Register page
 router.get('/register', (req, res) => {
-    res.render('register');
+    res.render('../FRONTEND_/views/register');
 });
 
 // Login page
 router.get('/login', (req, res) => {
-    res.render('login');
+    res.render('../FRONTEND_/views/login');
 });
 
 // Chat pages (require login)
 router.get('/channels', isLoggedIn, (req, res) => {
-    res.render('channels', { username: req.session.user });
+    res.render('../FRONTEND_/views/channels', { username: req.session.user });
 });
 
 router.get('/userDM', isLoggedIn, (req, res) => {
-    res.render('userDM', { username: req.session.user });
+    res.render('../FRONTEND_/views/userDM', { username: req.session.user });
 });
 
 // Admin pages
 router.get('/adminPage', isAdmin, async (req, res) => {
     const users = await User.find({});
-    res.render('adminPage', { users });
+    res.render('../FRONTEND_/views/adminPage', { users });
 });
 
 router.get('/editUser', isLoggedIn, async (req, res) => {
     const user = await User.findOne({ username: req.query.username });
-    res.render('editUser', { user });
+    res.render('../FRONTEND_/views/editUser', { user });
 });
 
 router.get('/editChannel', isLoggedIn, async (req, res) => {
     const channel = await Channel.findOne({ channelName: req.query.channelName });
-    res.render('editChannel', { channel });
+    res.render('../FRONTEND_/views/editChannel', { channel });
 });
 
 // Logout
