@@ -245,7 +245,8 @@
 
 
     <section class="home-section">
-        <div class="text">Channel Chatting</div><br><br>
+        <div class="text">Channel Chatting</div><button class="rightbutton" onclick="changeColor()">Dark
+            Mode</button><br><br>
         <p style="font-size: 24px; font-weight: bold; margin-left: 15px;">Available Channels</p>
         <div class="containingALL">
             <div class="containerDM">
@@ -304,6 +305,10 @@
         let positive_counter = 0;
         let negative_counter = 0;
 
+        function changeColor() {
+            const homeSection = document.querySelector('.home-section');
+            homeSection.classList.toggle('black');
+        }
 
         closeBtn.addEventListener("click", () => {
             sidebar.classList.toggle("open");
