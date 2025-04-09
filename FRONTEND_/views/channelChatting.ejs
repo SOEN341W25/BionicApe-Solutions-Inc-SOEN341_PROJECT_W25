@@ -238,6 +238,12 @@ button {
                 <div class="history-chatbox">
                     <ul id="messages"></ul>
             </div></div>
+
+            <div class="counterBox">
+                <h3>Counter of +/- messages</h3>
+                <p>Positive: <span id="positiveCount">0</span></p>
+                <p>Negative: <span id="negativeCount">0</span></p>
+            </div>
         </div>
         <br>
         <form id="form" action="">
@@ -271,6 +277,9 @@ button {
         let sidebar = document.querySelector(".sidebar");
         let closeBtn = document.querySelector("#btn");
         let searchBtn = document.querySelector(".bx-search");
+        let positive_counter=0;
+        let negative_counter =0;
+
 
         closeBtn.addEventListener("click", () => {
             sidebar.classList.toggle("open");
@@ -383,6 +392,10 @@ button {
         const leaveChannelForm = document.getElementById('leaveChannelForm');
 
 
+        function updateCounterDisplay() {
+            document.getElementById('positiveCount').textContent = positive_counter;
+            document.getElementById('negativeCount').textContent = negative_counter;
+        }
 
         function constructChatMessageFromJson(data) {
             if (!data.visible) {
@@ -411,11 +424,14 @@ button {
             item.setAttribute("data-visibility", msg.visible);
             if (msg.sentiment === 'positive') {
                 item.classList.add('positive');
+                postive_counter+=1;
             } else if (msg.sentiment === 'negative') {
                 item.classList.add('negative');
+                negative_counter+=1;
             } else {
                 item.classList.add('neutral');
             }    
+            updateCounterDisplay()
         }
         form.addEventListener('submit', (e) => {
             e.preventDefault();
