@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sidebar</title>
     <link rel="icon" href="/images/favicon.ico" />
-    <!-- <link rel="stylesheet" href="styles.css"> -->
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-    <!-- <script src="/scripts/chatScript.js"></script> -->
     <link href="/styles/styleChatDm.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -138,6 +136,24 @@
     border-left: 5px solid #dc3545;
 }
 
+.positive button {visibility: hidden;}
+.positive:hover button {visibility: visible;}
+.neutral button {visibility: hidden;}
+.neutral:hover button {visibility: visible;}
+.negative button {visibility: hidden;}
+.negative:hover button {visibility: visible;}
+
+button {
+    padding: 0px 4px;
+    font-size: 14px; 
+    background-color: transparent;
+    color: #4a2cb5;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
 </style>
 
 <body>
@@ -251,6 +267,112 @@
 
 
     <script>
+        
+        let sidebar = document.querySelector(".sidebar");
+        let closeBtn = document.querySelector("#btn");
+        let searchBtn = document.querySelector(".bx-search");
+
+        closeBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        searchBtn.addEventListener("click", () => {
+            sidebar.classList.toggle("open");
+            menuBtnChange();
+        })
+
+        function menuBtnChange() {
+            if (sidebar.classList.contains("open")) {
+                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
+            } else {
+                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
+            }
+        }
+
+        menuBtnChange();
+        displayAllChannel();
+
+        var currentChannel;
+
+        var currentRecipientUser;
+        var mode = '';
+        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
+
+        function toggleSidebar() {
+            const sidebar = document.getElementById('sidebar');
+            const toggleBtn = document.querySelector('.toggle-btn');
+
+
+            sidebar.classList.toggle('collapsed');
+
+
+            if (sidebar.classList.contains('collapsed')) {
+                toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
+            } else {
+                toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
+            }
+        }
+
+
+
+
+        const formEl = document.querySelector('.form');
+
+
+        formEl.addEventListener('submit', event => {
+            event.preventDefault();
+            const formData = new FormData(formEl);
+            const data = Object.fromEntries(formData);
+
+
+            fetch('/api/channel', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(data)
+            })
+                .then(res => res.json())
+                .then(data => {
+                    displayAllChannel(); // Refresh the list of channels
+                })
+                .catch(err => console.log(err));
+        });
+
+
+        function displayAllChannel() {
+            fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
+                .then(res => res.json())
+                .then(channels => {
+                    const renderList = document.getElementById('renderList');
+                    renderList.innerHTML = ''; // Clear the current list
+
+
+                    if (channels && channels.length > 0) {
+                        channels.forEach(channel => {
+                            const li = document.createElement('li');
+                            const a = document.createElement('a');
+                            a.href = '#';
+                            a.setAttribute("onclick", "selectChannel(this)");
+                            li.setAttribute("id", channel.channelName + "_id")
+                            a.textContent = channel.channelName;
+                            li.appendChild(a);
+                            renderList.appendChild(li);
+                        });
+                    } else {
+                        const li = document.createElement('li');
+                        li.textContent = 'No channels found.';
+                        renderList.appendChild(li);
+                    }
+                })
+                .catch(err => console.log(err));
+        }
+
+        // Call displayAllChannel on loading page to initially populate the list
+        document.addEventListener('DOMContentLoaded', displayAllChannel);
+
+
         const socket = io();
 
         const form = document.getElementById('form');
@@ -275,7 +397,16 @@
             const item = document.createElement('li');//creates the 'li' tag for each message sent
             item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
             messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul  
-            item.setAttribute("onclick", "deleteMessage(this)");
+
+            if (item.textContent != DELETED_MODERATOR_MESSAGE) {
+                item.appendChild(document.createElement('button')).textContent = "✖";
+                item.lastChild.setAttribute("onclick", "deleteMessage(this)");
+                item.lastChild.setAttribute("id", msg.messageId);
+                item.appendChild(document.createElement('button')).textContent = "⤵";
+                item.lastChild.setAttribute("onclick", "quoteMessage(this)");
+                item.lastChild.setAttribute("id", msg.messageId);
+            }
+
             item.setAttribute("id", msg.messageId);
             item.setAttribute("data-visibility", msg.visible);
             if (msg.sentiment === 'positive') {
@@ -428,8 +559,8 @@
         }
 
         function deleteMessage(element) {
-            let messageId = element.getAttribute("id");
-            let visible = element.getAttribute("data-visibility");
+            let messageId = element.parentElement.getAttribute("id");
+            let visible = element.parentElement.getAttribute("data-visibility");
             let visibleInBoolType = (visible === 'true');
             console.log(!visibleInBoolType);
             socket.emit('modify channel message', messageId, !visibleInBoolType);
@@ -450,114 +581,12 @@
             else {
                 findMessage.innerHTML = DELETED_MODERATOR_MESSAGE;
             }
-
-
-
-
-        });
-        let sidebar = document.querySelector(".sidebar");
-        let closeBtn = document.querySelector("#btn");
-        let searchBtn = document.querySelector(".bx-search");
-
-        closeBtn.addEventListener("click", () => {
-            sidebar.classList.toggle("open");
-            menuBtnChange();
-        })
-
-        searchBtn.addEventListener("click", () => {
-            sidebar.classList.toggle("open");
-            menuBtnChange();
-        })
-
-        function menuBtnChange() {
-            if (sidebar.classList.contains("open")) {
-                closeBtn.classList.replace("bx-menu", "bx-menu-alt-right");
-            } else {
-                closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
-            }
-        }
-
-        menuBtnChange();
-        displayAllChannel();
-
-        var currentChannel;
-
-        var currentRecipientUser;
-        var mode = '';
-        const DELETED_MODERATOR_MESSAGE = "Message is deleted by moderator";
-
-        function toggleSidebar() {
-            const sidebar = document.getElementById('sidebar');
-            const toggleBtn = document.querySelector('.toggle-btn');
-
-
-            sidebar.classList.toggle('collapsed');
-
-
-            if (sidebar.classList.contains('collapsed')) {
-                toggleBtn.style.left = '10px'; // Move button when sidebar is hidden
-            } else {
-                toggleBtn.style.left = '260px'; // Reset position when sidebar is visible
-            }
-        }
-
-
-
-
-        const formEl = document.querySelector('.form');
-
-
-        formEl.addEventListener('submit', event => {
-            event.preventDefault();
-            const formData = new FormData(formEl);
-            const data = Object.fromEntries(formData);
-
-
-            fetch('/api/channel', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(data)
-            })
-                .then(res => res.json())
-                .then(data => {
-                    displayAllChannel(); // Refresh the list of channels
-                })
-                .catch(err => console.log(err));
         });
 
-
-        function displayAllChannel() {
-            fetch('/api/user/channels') // Assuming this endpoint returns the list of channels
-                .then(res => res.json())
-                .then(channels => {
-                    const renderList = document.getElementById('renderList');
-                    renderList.innerHTML = ''; // Clear the current list
-
-
-                    if (channels && channels.length > 0) {
-                        channels.forEach(channel => {
-                            const li = document.createElement('li');
-                            const a = document.createElement('a');
-                            a.href = '#';
-                            a.setAttribute("onclick", "selectChannel(this)");
-                            li.setAttribute("id", channel.channelName + "_id")
-                            a.textContent = channel.channelName;
-                            li.appendChild(a);
-                            renderList.appendChild(li);
-                        });
-                    } else {
-                        const li = document.createElement('li');
-                        li.textContent = 'No channels found.';
-                        renderList.appendChild(li);
-                    }
-                })
-                .catch(err => console.log(err));
+        function quoteMessage(element) {
+            console.log(element.parentElement.innerHTML);
+            input.value += ("Quoting "+ element.parentElement.innerHTML.split("<")[0]);
         }
-
-        // Call displayAllChannel on loading page to initially populate the list
-        document.addEventListener('DOMContentLoaded', displayAllChannel);
 
 
     </script>

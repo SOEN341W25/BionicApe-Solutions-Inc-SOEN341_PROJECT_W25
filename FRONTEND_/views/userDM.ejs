@@ -6,9 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sidebar</title>
     <link rel="icon" href="/images/favicon.ico" />
-    <!-- <link rel="stylesheet" href="style.css"> -->
     <script src="https://cdn.socket.io/4.8.1/socket.io.min.js"></script>
-    <!-- <script src="/scripts/dmScript.js"></script> -->
     <link href="/styles/styleChatDm.css" rel="stylesheet">
     <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
 </head>
@@ -345,14 +343,15 @@ button {
             const item = document.createElement('li');//creates the 'li' tag for each message sent
             item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
             messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul
-
-            //item.setAttribute("onclick", "quoteMessage(this)");
-            item.appendChild(document.createElement('button')).textContent = "✖";
-            item.lastChild.setAttribute("onclick", "deleteMessage(this)");
-            item.lastChild.setAttribute("id", msg.messageId);
-            item.appendChild(document.createElement('button')).textContent = "⤵";
-            item.lastChild.setAttribute("onclick", "quoteMessage(this)");
-            item.lastChild.setAttribute("id", msg.messageId);
+            
+            if (item.textContent != DELETED_MODERATOR_MESSAGE) {
+                item.appendChild(document.createElement('button')).textContent = "✖";
+                item.lastChild.setAttribute("onclick", "deleteMessage(this)");
+                item.lastChild.setAttribute("id", msg.messageId);
+                item.appendChild(document.createElement('button')).textContent = "⤵";
+                item.lastChild.setAttribute("onclick", "quoteMessage(this)");
+                item.lastChild.setAttribute("id", msg.messageId);
+            }
 
             item.setAttribute("id", msg.messageId);
             item.setAttribute("data-visibility", msg.visible);
@@ -527,9 +526,8 @@ button {
         });
 
         function quoteMessage(element) {
-            //let messageId = element.getAttribute("id");
             console.log(element.parentElement.innerHTML);
-            input.value += ("Quoting "+ element.parentElement.innerHTML);
+            input.value += ("Quoting "+ element.parentElement.innerHTML.split("<")[0]);
         }
 
 
