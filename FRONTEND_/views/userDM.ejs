@@ -14,27 +14,27 @@
 <style>
     .form {
         display: flex;
-        flex-direction: row; 
+        flex-direction: row;
         align-items: center;
-        background: none; 
-        padding: 0; 
+        background: none;
+        padding: 0;
         max-width: 300px;
-        margin-left: 15px; 
+        margin-left: 15px;
     }
 
     .admin-input {
-        flex: 1; 
+        flex: 1;
         padding: 6px;
         border: 1px solid #ddd;
         border-radius: 6px;
-        font-size: 14px; 
-        margin-right: 5px; 
+        font-size: 14px;
+        margin-right: 5px;
         width: 180px;
     }
 
     .admin-btn {
         padding: 6px 12px;
-        font-size: 14px; 
+        font-size: 14px;
         background-color: #5d3fd3;
         color: white;
         border: none;
@@ -52,25 +52,25 @@
         display: flex;
         flex-direction: row;
         align-items: center;
-        background: none; 
-        padding: 0; 
+        background: none;
+        padding: 0;
         max-width: 300px;
-        margin-left: 15px; 
+        margin-left: 15px;
     }
 
     #inputInvite {
-        flex: 1; 
+        flex: 1;
         padding: 6px;
         border: 1px solid #ddd;
         border-radius: 6px;
         font-size: 14px;
-        margin-right: 5px; 
+        margin-right: 5px;
         width: 180px;
     }
 
     #invite {
-        padding: 6px 12px; 
-        font-size: 14px; 
+        padding: 6px 12px;
+        font-size: 14px;
         background-color: #5d3fd3;
         color: white;
         border: none;
@@ -85,16 +85,16 @@
 
     #leaveChannelForm {
         display: flex;
-        flex-direction: row; 
+        flex-direction: row;
         align-items: center;
-        background: none; 
-        padding: 0; 
-        max-width: 300px; 
-        margin-left: 15px; 
+        background: none;
+        padding: 0;
+        max-width: 300px;
+        margin-left: 15px;
     }
 
     #leaveChannel {
-        width: 100%; 
+        width: 100%;
         padding: 6px 12px;
         font-size: 14px;
         background-color: #e14b31;
@@ -121,39 +121,59 @@
         color: red;
     }
 
-.positive {
-    background-color: #d4edda !important;
-    border-left: 5px solid #28a745;
-}
+    .positive {
+        background-color: #d4edda !important;
+        border-left: 5px solid #28a745;
+    }
 
-.neutral {
-    background-color: #f8f9fa !important;
-    border-left: 5px solid #6c757d;
-}
+    .neutral {
+        background-color: #f8f9fa !important;
+        border-left: 5px solid #6c757d;
+    }
 
-.negative {
-    background-color: #f8d7da !important;
-    border-left: 5px solid #dc3545;
-}
+    .negative {
+        background-color: #f8d7da !important;
+        border-left: 5px solid #dc3545;
+    }
 
-.positive button {visibility: hidden;}
-.positive:hover button {visibility: visible;}
-.neutral button {visibility: hidden;}
-.neutral:hover button {visibility: visible;}
-.negative button {visibility: hidden;}
-.negative:hover button {visibility: visible;}
+    .positive button {
+        visibility: hidden;
+    }
 
-button {
-    padding: 0px 4px;
-    font-size: 14px; 
-    background-color: transparent;
-    color: #4a2cb5;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    transition: background 0.3s;
-}
+    .positive:hover button {
+        visibility: visible;
+    }
 
+    .neutral button {
+        visibility: hidden;
+    }
+
+    .neutral:hover button {
+        visibility: visible;
+    }
+
+    .negative button {
+        visibility: hidden;
+    }
+
+    .negative:hover button {
+        visibility: visible;
+    }
+
+    button {
+        padding: 0px 4px;
+        font-size: 14px;
+        background-color: transparent;
+        color: #4a2cb5;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+
+    .counterBox {
+        background-color: red;
+    }
 </style>
 
 <body>
@@ -197,10 +217,12 @@ button {
             <li class="profile">
                 <div class="profile-details">
                     <div class="name_job"><br>
-                        <div class="name"><%= username %></div>
+                        <div class="name">
+                            <%= username %>
+                        </div>
                     </div>
                 </div>
-                <form style="display: inline;" id="logoutForm";>
+                <form style="display: inline;" id="logoutForm" ;>
                     <button type="submit" id="log_out_btn">
                         <i class='bx bx-log-out' id="log_out"></i>
                     </button>
@@ -226,13 +248,21 @@ button {
                 <i id="lastActiveAtTitle"></i> <br><br>
                 <div class="history-chatbox">
                     <ul id="messages"></ul>
-            </div></div>
+                </div>
+            </div>
+
+            <div class="counterBox">
+                <h3>Counter of +/- messages</h3>
+                <p>Positive: <span id="positiveCount">0</span></p>
+                <p>Negative: <span id="negativeCount">0</span></p>
+            </div>
+
 
         </div><br>
         <form id="form" action="">
             <input id="input" autocomplete="off" />
             <%- include('partials/emojiBox.ejs') %>
-            <button id="toes">Send</button>
+                <button id="toes">Send</button>
         </form>
 
         <div class="waves">
@@ -247,6 +277,8 @@ button {
         let sidebar = document.querySelector(".sidebar");
         let closeBtn = document.querySelector("#btn");
         let searchBtn = document.querySelector(".bx-search");
+        let positive_counter = 0;
+        let negative_counter = 0;
         displayAllUser();
 
         closeBtn.addEventListener("click", () => {
@@ -265,6 +297,10 @@ button {
             } else {
                 closeBtn.classList.replace("bx-menu-alt-right", "bx-menu");
             }
+        }
+        function updateCounterDisplay() {
+            document.getElementById('positiveCount').textContent = positive_counter;
+            document.getElementById('negativeCount').textContent = negative_counter;
         }
 
         menuBtnChange();
@@ -343,7 +379,7 @@ button {
             const item = document.createElement('li');//creates the 'li' tag for each message sent
             item.textContent = constructChatMessageFromJson(msg);//fill 'li' tag with certain content which is the message received
             messagesUL.appendChild(item);//messages has ul and it will add it to its child which is inside of the tag ul
-            
+
             if (item.textContent != DELETED_MODERATOR_MESSAGE) {
                 item.appendChild(document.createElement('button')).textContent = "✖";
                 item.lastChild.setAttribute("onclick", "deleteMessage(this)");
@@ -357,11 +393,14 @@ button {
             item.setAttribute("data-visibility", msg.visible);
             if (msg.sentiment === 'positive') {
                 item.classList.add('positive');
+                positive_counter += 1;
             } else if (msg.sentiment === 'negative') {
                 item.classList.add('negative');
+                negative_counter += 1;
             } else {
                 item.classList.add('neutral');
-            }    
+            }
+            updateCounterDisplay();
         }
         form.addEventListener('submit', (e) => {
             e.preventDefault();
@@ -397,7 +436,7 @@ button {
             }
         });
 
-        
+
         socket.on('dms to user', (msg, currentRecipient) => {
             console.log("I have received dm", msg, currentRecipient);
             if (currentRecipient === currentRecipientUser) {
@@ -413,25 +452,25 @@ button {
             }
         });
 
-        socket.on('user status',  (currentRecipient)=>{
+        socket.on('user status', (currentRecipient) => {
             const liUserNameToUpdate = document.getElementById(currentRecipient.username + "_id");
-            
+
             let i = liUserNameToUpdate.getElementsByTagName('i');
 
-            
+
             // Check if userStatus exists, otherwise use a default value
-            
+
             if (currentRecipient.userStatus == "online") {
-                 i[0].setAttribute("class", "userStatus_online");
+                i[0].setAttribute("class", "userStatus_online");
             } else {
-                  i[0].setAttribute("class", "userStatus");
+                i[0].setAttribute("class", "userStatus");
             }
             i[0].textContent = currentRecipient.userStatus;
             console.log("the recipient's status has changed", currentRecipient);
-        
-        }); 
 
-        
+        });
+
+
         function clearBox(elementID) {
             console.log(elementID);
             let element = document.getElementById(elementID);
@@ -527,7 +566,7 @@ button {
 
         function quoteMessage(element) {
             console.log(element.parentElement.innerHTML);
-            input.value += ("Quoting "+ element.parentElement.innerHTML.split("<")[0]);
+            input.value += ("Quoting " + element.parentElement.innerHTML.split("<")[0]);
         }
 
 
