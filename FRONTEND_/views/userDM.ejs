@@ -232,7 +232,8 @@
     </div>
 
     <section class="home-section">
-        <div class="text">Chat with Fellow APES</div>
+        <div class="text">Chat with Fellow APES</div><button class="rightbutton" onclick="changeColor()">Dark
+            Mode</button>
         <div class="containingALL">
             <div class="containerDM">
                 <!-- User list -->
@@ -281,6 +282,10 @@
         let negative_counter = 0;
         displayAllUser();
 
+        function changeColor() {
+            const homeSection = document.querySelector('.home-section');
+            homeSection.classList.toggle('black');
+        }
         closeBtn.addEventListener("click", () => {
             sidebar.classList.toggle("open");
             menuBtnChange();
