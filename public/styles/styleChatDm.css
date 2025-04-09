@@ -628,5 +628,6 @@
   background-color: #babbff;
   color: white;
   border: none;
+  border-radius: 0px;
   cursor: pointer;
 }
