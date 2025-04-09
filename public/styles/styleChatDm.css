@@ -376,8 +376,8 @@
 .rightbutton {
   position: absolute;
   right: 0;
-  margin-right: 50px;
-  margin-top: 50px;
+  margin-right: 150px;
+  margin-top: 30px;
 
   background-color: #E0B0FF;
   border: 2px solid darkviolet;
