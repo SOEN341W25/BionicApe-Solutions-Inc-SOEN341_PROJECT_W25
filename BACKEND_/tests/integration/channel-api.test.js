@@ -47,7 +47,7 @@ app.post('/api/channel', async (req, res) => {
     
     const channel = new Channel({
       channelName,
-      public,
+      isPublic,
       users: [],
       messageIds: []
     });
@@ -106,14 +106,14 @@ describe('Channel API Integration Tests', () => {
     // Add test channels
     await Channel.create({
       channelName: 'General',
-      public: true,
+      isPublic: true,
       users: ['user1', 'user2'],
       messageIds: []
     });
     
     await Channel.create({
       channelName: 'Random',
-      public: true,
+      isPublic: true,
       users: ['user1'],
       messageIds: []
     });
@@ -133,7 +133,7 @@ describe('Channel API Integration Tests', () => {
     // Add test channel
     await Channel.create({
       channelName: 'Engineering',
-      public: false,
+      isPublic: false,
       users: ['engineer1', 'engineer2'],
       messageIds: []
     });
@@ -153,7 +153,7 @@ describe('Channel API Integration Tests', () => {
   test('POST /api/channel should create a new channel', async () => {
     const channelData = {
       channelName: 'NewChannel',
-      public: true
+      isPublic: true
     };
     
     // Make API request
@@ -176,7 +176,7 @@ describe('Channel API Integration Tests', () => {
     // Create a channel
     await Channel.create({
       channelName: 'General',
-      public: true,
+      isPublic: true,
       users: ['user1'],
       messageIds: []
     });
