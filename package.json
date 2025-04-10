@@ -11,8 +11,8 @@
     "test:integration": "jest --config=jest.integration.config.js",
     "test:acceptance": "jest --config=jest.acceptance.config.js",
     "test:all": "npm run test:unit && npm run test:integration && npm run test:acceptance"
-  }
-  },
+ }
+}
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "body-parser": "^1.20.2",
