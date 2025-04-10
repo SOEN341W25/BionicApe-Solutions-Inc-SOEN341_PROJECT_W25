@@ -48,7 +48,7 @@ describe('Message API Integration Tests', () => {
     // Create a test channel
     const channel = new Channel({
       channelName: 'General',
-      public: true,
+      isPublic: true,
       users: ['user1', 'user2'],
       messageIds: []
     });
@@ -142,7 +142,7 @@ describe('Message API Integration Tests', () => {
     // Create a test channel
     const channel = new Channel({
       channelName: 'TestChannel',
-      public: true,
+      isPublic: true,
       users: ['user1'],
       messageIds: []
     });
