@@ -143,3 +143,6 @@ jobs:
           # This would be replaced with actual deployment steps
           # For example, deploying to a staging server
           echo "Deployed to development environment"
+          
+- name: Install required libraries
+  run: sudo apt-get update && sudo apt-get install -y libssl1.1
