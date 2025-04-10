@@ -3,7 +3,7 @@ module.exports = {
   testEnvironment: 'node',
   setupFilesAfterEnv: [path.resolve(__dirname, './BACKEND_/tests/jest.setup.js')],
   moduleFileExtensions: ['js'],
-  testMatch: ['**/backend/tests/integration/**/*.test.js'],
+  testMatch: ['**/BACKEND_/tests/integration/**/*.test.js'],
   collectCoverage: true,
   coverageReporters: ['text', 'lcov'],
   coverageDirectory: 'coverage-integration',
