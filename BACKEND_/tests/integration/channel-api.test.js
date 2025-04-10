@@ -92,7 +92,7 @@ beforeAll(async () => {
   });
 });
 
-  afterAll(async () => {
+ afterAll(async () => {
   await mongoose.disconnect();
   if (mongoServer && typeof mongoServer.stop === 'function') {
     await mongoServer.stop();
