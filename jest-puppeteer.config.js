@@ -1,13 +1,13 @@
+// jest-puppeteer.config.js
 module.exports = {
   launch: {
-    headless: "new",
-    args: ['--no-sandbox', '--disable-setuid-sandbox', '--disable-gpu']
+    headless: true,
+    args: ['--no-sandbox', '--disable-setuid-sandbox']
   },
   server: {
-    command: 'NODE_ENV=test node app.js',
+    command: 'node app.js',
     port: 3000,
-    launchTimeout: 30000,
+    launchTimeout: 10000,
     debug: true
-  },
-  browserContext: 'default'
+  }
 };
