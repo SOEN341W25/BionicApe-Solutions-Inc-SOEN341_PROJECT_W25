@@ -1,7 +1,7 @@
 // tests/integration/message-api.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryServer } = require('../mongo-memory-server-mock');
 const express = require('express');
 const Message = require('../../model/Message');
 const Counters = require('../../model/Counters');
