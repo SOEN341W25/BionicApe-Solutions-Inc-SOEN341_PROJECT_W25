@@ -3,16 +3,15 @@
   "version": "1.0.0",
   "description": "ChatHaven real-time chat application",
   "main": "app.js",
-  "scripts": {
+ "scripts": {
     "start": "node app.js",
     "dev": "nodemon app.js",
     "test": "jest",
     "test:unit": "jest --config=jest.unit.config.js",
     "test:integration": "jest --config=jest.integration.config.js",
     "test:acceptance": "jest --config=jest.acceptance.config.js",
-    "test:all": "npm run test:unit && npm run test:integration && npm run test:acceptance",
-    "lint": "eslint .",
-    "lint:fix": "eslint . --fix"
+    "test:all": "npm run test:unit && npm run test:integration && npm run test:acceptance"
+  }
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
