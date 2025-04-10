@@ -86,7 +86,7 @@ describe('Socket.io Integration Tests', () => {
             const updatedChannel = {
               channelName,
               users: ['existingUser', username],
-              public: false
+              isPublic: false
             };
             
             // Emit result to the client
