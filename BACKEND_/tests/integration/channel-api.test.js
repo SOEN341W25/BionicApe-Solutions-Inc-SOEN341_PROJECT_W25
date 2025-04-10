@@ -37,7 +37,7 @@ app.get('/api/channel/:channelName', async (req, res) => {
 
 app.post('/api/channel', async (req, res) => {
   try {
-    const { channelName, public = true } = req.body;
+    const { channelName, isPublic = true } = req.body;
     
     // Check if channel already exists
     const existingChannel = await Channel.findOne({ channelName });
