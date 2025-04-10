@@ -4,7 +4,7 @@ const { Server } = require('socket.io');
 const Client = require('socket.io-client');
 const express = require('express');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryServer } = require('../mongo-memory-server-mock');
 
 const Message = require('../../model/Message');
 const Channel = require('../../model/Channel');
@@ -107,15 +107,16 @@ describe('Socket.io Integration Tests', () => {
     });
   });
   
-  afterAll(async () => {
-    // Clean up
-    await mongoose.disconnect();
+ afterAll(async () => {
+  // Clean up
+  await mongoose.disconnect();
+  if (mongoServer && typeof mongoServer.stop === 'function') {
     await mongoServer.stop();
-    if (clientSocket.connected) {
-      clientSocket.disconnect();
-    }
-    httpServer.close();
-  });
+  }
+  if (clientSocket.connected) {
+    clientSocket.disconnect();
+  }
+});
   
   beforeEach(async () => {
     // Clear collections between tests
