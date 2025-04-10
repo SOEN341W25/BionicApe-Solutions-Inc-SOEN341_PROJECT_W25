@@ -1,7 +1,7 @@
 // tests/integration/channel-api.test.js
 const request = require('supertest');
 const mongoose = require('mongoose');
-const { MongoMemoryServer } = require('mongodb-memory-server');
+const { MongoMemoryServer } = require('../mongo-memory-server-mock');
 const express = require('express');
 const Channel = require('../../model/Channel');
 const User = require('../../model/User');
@@ -82,19 +82,22 @@ app.put('/api/channel/:channelName', async (req, res) => {
 describe('Channel API Integration Tests', () => {
   let mongoServer;
 
-  beforeAll(async () => {
-    mongoServer = await MongoMemoryServer.create();
-    const uri = mongoServer.getUri();
-    await mongoose.connect(uri, {
-      useNewUrlParser: true,
-      useUnifiedTopology: true,
-    });
+beforeAll(async () => {
+  mongoServer = await MongoMemoryServer.create();
+  const mongoUri = mongoServer.getUri();
+  
+  await mongoose.connect(mongoUri, {
+    useNewUrlParser: true,
+    useUnifiedTopology: true
   });
+});
 
   afterAll(async () => {
-    await mongoose.disconnect();
+  await mongoose.disconnect();
+  if (mongoServer && typeof mongoServer.stop === 'function') {
     await mongoServer.stop();
-  });
+  }
+});
 
   beforeEach(async () => {
     // Clear collections between tests
