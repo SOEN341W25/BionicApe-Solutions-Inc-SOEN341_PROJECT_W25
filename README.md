@@ -4,9 +4,9 @@ ChatHaven is a versatile communication platform designed for seamless interactio
 
 ## Team Members and Roles 
 * Yahia ElSharkawi : Backend Developer
-* Talal Hammami : FrontEnd Developer
+* Talal Hammami : FrontEnd Developer,  Product Owner #4
 * Mari Kajita : Backend Developer
-* Suriya Paramathypathy : FrontEnd Developer, Product Owner #4
+* Suriya Paramathypathy : FrontEnd Developer
 * Levon Tavitian : Backend Developer,  Secretary Sprint #4
 * Mathis Vuong : Backend Developer, Scrum Master Sprint #4
 
