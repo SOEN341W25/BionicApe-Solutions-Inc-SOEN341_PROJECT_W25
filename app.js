@@ -431,7 +431,15 @@
       }
   });
   
-  
+  app.post("/api/user/setAutoReply", isLoggedIn, async (req, res) => {
+    const user = await User.findOneAndUpdate(
+        { username: req.session.user },
+        { autoReplyMessage: req.body.autoReplyMessage },
+        { new: true }
+    );
+    res.status(200).json({ message: "Auto-reply set", user });
+});
+
   
   
   
@@ -566,7 +574,16 @@
       {
         console.log("recipient socket id does not exist or sending to yourself");
       }
-  
+
+      const recipient = await User.findOne({ username: currentRecipientUser });
+
+      if ((!recipientSocketId || recipient.userStatus !== "online") && recipient && recipient.autoReplyMessage) {
+          let autoReply = await saveDmToDatabase(currentRecipientUser, userName, recipient.autoReplyMessage);
+          autoReply = autoReply.toObject();
+          autoReply.sentiment = 'neutral';
+          io.to(senderSocketId).emit('dms to user', autoReply, userName);
+      }
+    
     });
   
   
