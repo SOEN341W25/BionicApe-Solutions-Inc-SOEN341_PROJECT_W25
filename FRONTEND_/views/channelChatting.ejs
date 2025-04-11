@@ -239,6 +239,12 @@
                     </button>
                 </form>
             </li>
+            <li>
+                <form id="autoReplyForm">
+                    <input type="text" class="admin-input" id="autoReplyInput" placeholder="Set auto-reply..." />
+                    <button class="admin-btn" type="submit">Save</button>
+                </form>
+            </li>            
             <% if (username==="admin" ) { %>
                 <li>
                     <a href="/adminPage" class="sidebar-btn">
@@ -247,8 +253,7 @@
                     </a>
                     <span class="tooltip">Admin Page</span>
                 </li>
-                <% } %>
-
+            <% } %>
         </ul>
     </div>
 

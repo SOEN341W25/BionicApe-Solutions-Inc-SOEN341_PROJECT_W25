@@ -226,6 +226,13 @@
                 </a>
                 <span class="tooltip">Settings</span>
             </li>
+            <li>
+                <form id="autoReplyForm">
+                    <input type="text" class="admin-input" id="autoReplyInput" placeholder="Set auto-reply..." />
+                    <button class="admin-btn" type="submit">Save</button>
+                </form>
+            </li>
+            
             <li class="profile">
                 <div class="profile-details">
                     <div class="name_job"><br>
@@ -240,6 +247,15 @@
                     </button>
                 </form>
             </li>
+            <% if (username==="admin" ) { %>
+                <li>
+                    <a href="/adminPage" class="sidebar-btn">
+                        <i class='bx bx-arrow-back'></i>
+                        <span class="links_name">Back to Admin</span>
+                    </a>
+                    <span class="tooltip">Admin Page</span>
+                </li>
+            <% } %>
         </ul>
     </div>
 

@@ -38,7 +38,12 @@ const userSchema = new Schema({
     lastActivateAt: {
         type: Date,
         default: Date.now
+    },
+    autoReplyMessage: {
+        type: String,
+        default: "I'm currently offline. I’ll get back to you soon!"
     }
+    
 });
 
 // Remove password when transforming to JSON

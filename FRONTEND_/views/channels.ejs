@@ -313,20 +313,51 @@
         color: red;
     }
 
-.positive {
-    background-color: #d4edda !important;
-    border-left: 5px solid #28a745;
-}
+    .admin-btn {
+        padding: 6px 12px;
+        font-size: 14px;
+        background-color: #5d3fd3;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background 0.3s;
+    }
+    
+    .admin-btn:hover {
+        background-color: #2b98cb;
 
-.neutral {
-    background-color: #f8f9fa !important;
-    border-left: 5px solid #6c757d;
-}
+    }
 
-.negative {
-    background-color: #f8d7da !important;
-    border-left: 5px solid #dc3545;
-}
+    .admin-btn:active {
+        background-color: #2587b5;
+
+    }
+
+    .sidebar:not(.open) .admin-btn {
+        display: none;
+        transition: all 0.2s ease;
+    }
+
+    .sidebar .admin-btn {
+        display: block;
+        transition: all 0.5s ease;
+    }
+
+    .positive {
+        background-color: #d4edda !important;
+        border-left: 5px solid #28a745;
+    }
+
+    .neutral {
+        background-color: #f8f9fa !important;
+        border-left: 5px solid #6c757d;
+    }
+
+    .negative {
+        background-color: #f8d7da !important;
+        border-left: 5px solid #dc3545;
+    }
 
 
 </style>
@@ -375,6 +406,12 @@
                     <button type="submit" id="log_out_btn">
                         <i class='bx bx-log-out' id="log_out"></i>
                     </button>
+                </form>
+            </li>
+                        <li>
+                <form id="autoReplyForm">
+                    <input type="text" class="admin-input" id="autoReplyInput" placeholder="Set auto-reply..." />
+                    <button class="admin-btn" type="submit">Save</button>
                 </form>
             </li>
             <% if (username === "admin") { %>

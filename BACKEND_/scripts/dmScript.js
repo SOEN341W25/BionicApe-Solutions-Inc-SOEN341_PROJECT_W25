@@ -72,6 +72,22 @@ function displayAllUser() {
 //call displayAllUser on loading page to initially populate the list
 document.addEventListener('DOMContentLoaded', displayAllUser);
 
+const autoReplyForm = document.getElementById('autoReplyForm');
+const autoReplyInput = document.getElementById('autoReplyInput');
+
+autoReplyForm.addEventListener('submit', (e) => {
+    e.preventDefault();
+    const message = autoReplyInput.value;
+    fetch('/api/user/setAutoReply', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ autoReplyMessage: message }),
+    }).then(res => res.json())
+      .then(data => alert("Auto-reply saved!"));
+});
+
 
 const socket = io();
 
@@ -238,8 +254,7 @@ socket.on('modify channel message', (message, visible) => {
     else {
         findMessage.innerHTML = DELETED_MODERATOR_MESSAGE;
     }
-
-
+    
 
 
 });
