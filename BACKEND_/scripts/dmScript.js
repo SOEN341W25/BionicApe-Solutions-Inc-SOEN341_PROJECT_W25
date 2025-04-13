@@ -72,21 +72,31 @@ function displayAllUser() {
 //call displayAllUser on loading page to initially populate the list
 document.addEventListener('DOMContentLoaded', displayAllUser);
 
-const autoReplyForm = document.getElementById('autoReplyForm');
-const autoReplyInput = document.getElementById('autoReplyInput');
+document.addEventListener("DOMContentLoaded", () => {
+    const autoReplyForm = document.getElementById('autoReplyForm');
+    const autoReplyInput = document.getElementById('autoReplyInput');
 
-autoReplyForm.addEventListener('submit', (e) => {
-    e.preventDefault();
-    const message = autoReplyInput.value;
-    fetch('/api/user/setAutoReply', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ autoReplyMessage: message }),
-    }).then(res => res.json())
-      .then(data => alert("Auto-reply saved!"));
+    autoReplyForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const message = autoReplyInput.value;
+
+        fetch('/api/user/setAutoReply', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            credentials: 'same-origin',
+            body: JSON.stringify({ autoReplyMessage: message }),
+        })
+        
+        .then(res => res.json())
+        .then(data => {
+            alert("Auto-reply saved!");
+            console.log("Response:", data);
+        });
+    });
 });
+
 
 
 const socket = io();
