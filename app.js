@@ -528,6 +528,26 @@
     console.log(user, "this is connect mode");
     io.emit('user status', user);
     
+    socket.on('set away', async () => {
+      const username = socket.request.session.user;
+      const user = await User.findOneAndUpdate(
+          { username },
+          { userStatus: "away" },
+          { new: true }
+      );
+      io.emit("user status", user);
+    });
+  
+    socket.on('set online', async () => {
+      const username = socket.request.session.user;
+      const user = await User.findOneAndUpdate(
+          { username },
+          { userStatus: "online" },
+          { new: true }
+      );
+      io.emit("user status", user);
+    });
+  
   
     socket.on('channel message', async (msg, channelName)=>{
       let userName=socket.request.session.user;
@@ -581,12 +601,21 @@
 
       const recipient = await User.findOne({ username: currentRecipientUser });
 
-      if ((!recipientSocketId || recipient.userStatus !== "online") && recipient && recipient.autoReplyMessage) {
-          let autoReply = await saveDmToDatabase(currentRecipientUser, userName, recipient.autoReplyMessage, 'neutral', true);
+      const isAwayOrOffline = recipient.userStatus === "away" || recipient.userStatus === "offline";
+      
+      if (isAwayOrOffline && recipient.autoReplyMessage) {
+          let autoReply = await saveDmToDatabase(
+              currentRecipientUser,
+              userName,
+              recipient.autoReplyMessage,
+              'neutral',
+              true
+          );
           autoReply = autoReply.toObject();
           autoReply.autoReply = true;
           io.to(senderSocketId).emit('dms to user', autoReply, userName);
       }
+      
     
     });
   

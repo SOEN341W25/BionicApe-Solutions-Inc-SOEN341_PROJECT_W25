@@ -142,6 +142,10 @@
         font-style: italic;
     }
 
+    .userStatus_away {
+        color: orange;
+    }   
+
     .positive button {
         visibility: hidden;
     }
@@ -543,11 +547,14 @@
 
             // Check if userStatus exists, otherwise use a default value
 
-            if (currentRecipient.userStatus == "online") {
+            if (currentRecipient.userStatus === "online") {
                 i[0].setAttribute("class", "userStatus_online");
+            } else if (currentRecipient.userStatus === "away") {
+                i[0].setAttribute("class", "userStatus_away");
             } else {
                 i[0].setAttribute("class", "userStatus");
             }
+
             i[0].textContent = currentRecipient.userStatus;
             console.log("the recipient's status has changed", currentRecipient);
 
@@ -651,6 +658,25 @@
             console.log(element.parentElement.innerHTML);
             input.value += ("Quoting " + element.parentElement.innerHTML.split("<")[0]);
         }
+
+        let inactivityTimer;
+        const inactivityTime = 10000;
+
+        function resetInactivityTimer() {
+            clearTimeout(inactivityTimer);
+
+            socket.emit("set online");
+
+            inactivityTimer = setTimeout(() => {
+                socket.emit("set away");
+            }, inactivityTime);
+        }
+
+        ['click', 'mousemove', 'keypress', 'scroll'].forEach(event => {
+            window.addEventListener(event, resetInactivityTimer);
+        });
+
+        resetInactivityTimer();
 
 
     </script>
