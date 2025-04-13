@@ -245,7 +245,7 @@
                     <button class="admin-btn" type="submit">Save</button>
                 </form>
             </li>            
-            <% if (username==="admin" ) { %>
+            <% if (role==="Admin" ) { %>
                 <li>
                     <a href="/adminPage" class="sidebar-btn">
                         <i class='bx bx-arrow-back'></i>
@@ -318,6 +318,7 @@
         let sidebar = document.querySelector(".sidebar");
         let closeBtn = document.querySelector("#btn");
         let searchBtn = document.querySelector(".bx-search");
+        const countedMessages = new Set();
         let positive_counter = 0;
         let negative_counter = 0;
 
@@ -489,15 +490,32 @@
 
             item.setAttribute("id", msg.messageId);
             item.setAttribute("data-visibility", msg.visible);
-            if (msg.sentiment === 'positive') {
-                item.classList.add('positive');
-                postive_counter += 1;
-            } else if (msg.sentiment === 'negative') {
-                item.classList.add('negative');
-                negative_counter += 1;
+            if (msg.autoReply) {
+                item.classList.add('auto-reply');
             } else {
-                item.classList.add('neutral');
+                if (!countedMessages.has(msg.messageId)) {
+                    if (msg.sentiment === 'positive') {
+                        item.classList.add('positive');
+                        positive_counter += 1;
+                    } else if (msg.sentiment === 'negative') {
+                        item.classList.add('negative');
+                        negative_counter += 1;
+                    } else {
+                        item.classList.add('neutral');
+                    }
+
+                    countedMessages.add(msg.messageId);
+                } else {
+                    if (msg.sentiment === 'positive') {
+                        item.classList.add('positive');
+                    } else if (msg.sentiment === 'negative') {
+                        item.classList.add('negative');
+                    } else {
+                        item.classList.add('neutral');
+                    }
+                }
             }
+
             updateCounterDisplay()
         }
         form.addEventListener('submit', (e) => {

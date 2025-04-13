@@ -26,6 +26,10 @@ const messageSchema = new Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    autoReply: {
+        type: Boolean,
+        default: false
     }
 });
 

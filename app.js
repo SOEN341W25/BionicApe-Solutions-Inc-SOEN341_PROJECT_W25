@@ -204,7 +204,7 @@
     res.status(200).json(user);
   });
   
-  async function saveDmToDatabase(senderName, recipientName, message)
+  async function saveDmToDatabase(senderName, recipientName, message, sentiment, autoReply = false)
   {
     let senderUsername = senderName;
     let recipientUsername = recipientName;
@@ -212,7 +212,9 @@
     let newMessage = await Message.create({
         messageId: nextId,
         msg: message,
-        username: senderUsername
+        username: senderUsername,
+        sentiment: sentiment,
+        autoReply: autoReply
     });
   
     
@@ -267,12 +269,13 @@
   return message;
   };
   
-  async function saveChannelMessageInDatabase(message, user, channelname){
+  async function saveChannelMessageInDatabase(message, user, channelname, sentiment){
       let nextId = await preIncrement("messageId");
       let newMessage = await Message.create({ // database query
           messageId: nextId,
           msg:message,
-          username:user
+          username:user,
+          sentiment: sentiment
   
       });
       await Channel.findOneAndUpdate( // database query
@@ -329,7 +332,7 @@
       return res.redirect('/login'); // Ensure the user is logged in
     }
   
-    res.render('channelChatting', {username: req.session.user }); // Make sure this file exists in the "views" folder
+    res.render('channelChatting', {username: req.session.user, role: req.session.role }); // Make sure this file exists in the "views" folder
   });
   
   app.get('/userDM',function (req, res){
@@ -337,7 +340,7 @@
       return res.redirect('/login'); // Ensure the user is logged in
     }
   
-    res.render('userDM', { username: req.session.user }); // Make sure this file exists in the "views" folder
+    res.render('userDM', { username: req.session.user, role: req.session.role }); // Make sure this file exists in the "views" folder
   });
   
   //Showing channel form
@@ -348,7 +351,7 @@
   
     try {
       const channels = await Channel.find({});
-      res.render("channels", { channels,  username: req.session.user  });
+      res.render("channels", { channels,  username: req.session.user, role: req.session.role  });
     } catch (err) {
       console.error(err);
       res.status(500).json({ error: "An error occurred while fetching channels." });
@@ -411,6 +414,7 @@
           const result = req.body.password === user.password;
           if (result) {
             req.session.user=req.body.username;//to log in
+            req.session.role = user.role;
             console.log("Set Current Session variable:" +req.session.user)
             // res.status(200).json({status:"Logged in"})// ask user to change html page
             if(user.role === "Admin"){
@@ -531,7 +535,7 @@
       const result = sentiment.analyze(msg);
       const sentimentLabel = result.score > 0 ? 'positive' : result.score < 0 ? 'negative' : 'neutral';
   
-      let newMessage= await saveChannelMessageInDatabase(msg, userName, channelName);
+      let newMessage= await saveChannelMessageInDatabase(msg, userName, channelName, sentimentLabel);
       newMessage = newMessage.toObject();
       newMessage.sentiment = sentimentLabel;
       io.emit('channel message',newMessage, channelName);//backend will rebroadcast it to everyone 
@@ -549,7 +553,7 @@
       const recipientSocketId=usersocketmap[currentRecipientUser];
       console.log(senderSocketId);
       console.log(recipientSocketId);
-      let newMessage= await saveDmToDatabase(userName, currentRecipientUser, msg);
+      let newMessage= await saveDmToDatabase(userName, currentRecipientUser, msg, sentimentLabel);
   
       newMessage = newMessage.toObject();
       newMessage.sentiment = sentimentLabel;
@@ -578,9 +582,9 @@
       const recipient = await User.findOne({ username: currentRecipientUser });
 
       if ((!recipientSocketId || recipient.userStatus !== "online") && recipient && recipient.autoReplyMessage) {
-          let autoReply = await saveDmToDatabase(currentRecipientUser, userName, recipient.autoReplyMessage);
+          let autoReply = await saveDmToDatabase(currentRecipientUser, userName, recipient.autoReplyMessage, 'neutral', true);
           autoReply = autoReply.toObject();
-          autoReply.sentiment = 'neutral';
+          autoReply.autoReply = true;
           io.to(senderSocketId).emit('dms to user', autoReply, userName);
       }
     
