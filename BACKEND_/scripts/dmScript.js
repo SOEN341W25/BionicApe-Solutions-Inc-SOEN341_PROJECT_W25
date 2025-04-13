@@ -161,7 +161,7 @@ socket.on('channel message', (msg, channelName) => {
 });
 socket.on('dms to user', (msg, currentRecipient) => {
     console.log("I have received dm", msg, currentRecipient);
-    if (currentRecipient === currentRecipientUser) {
+    if (mode === 'dms' && (partnerUser === currentRecipientUser || msg.username === currentRecipientUser)) {
         addChatMessageToChatBox(msg);
         window.scrollTo(0, document.body.scrollHeight);//some scrolling
     }
